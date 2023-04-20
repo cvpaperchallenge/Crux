@@ -15,6 +15,6 @@ services:
       dockerfile: environments/Dockerfile
     tty: true
     volumes:
-        - ../../:/home/challenger/ascender
+        - ../../:/home/challenger/crux
     ports:
         - 8000:8000

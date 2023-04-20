@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ascender"
+name = "crux"
 version = "0.1.0"
 description = "Project template for XCCV group of cvpaper.challenge."
 license = "MIT"
@@ -7,7 +7,7 @@ authors = ["cvpaper.challenge XCCV group"]
 maintainers = ["yoshihiro fukuhara <gatheluck@gmail.com>"]
 readme = "README.md"
 keywords = [
-    "ascender",
+    "crux",
     "Python",
     "projects",
     "project templates",
