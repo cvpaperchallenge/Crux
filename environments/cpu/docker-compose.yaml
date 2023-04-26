@@ -1,17 +1,15 @@
 version: "3.8"
 
 services:
-  core:
+  backend:
     build:
       args:
-        - BASE_IMAGE=ubuntu:20.04
-        - PYTHON_VERSION=3.8
         - UID=${HOST_UID-1000}
         - GID=${HOST_GID-1000}
       context: ../../
-      dockerfile: environments/Dockerfile
+      dockerfile: environments/Dockerfile.backend
     tty: true
     volumes:
-        - ../../:/home/challenger/crux
+        - ../../applications/backend:/home/challenger/backend
     ports:
         - 8000:8000
