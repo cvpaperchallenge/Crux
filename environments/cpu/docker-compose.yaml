@@ -13,3 +13,16 @@ services:
         - ../../applications/backend:/home/challenger/backend
     ports:
         - 8000:8000
+  
+  frontend:
+    build:
+      args:
+        - UID=${HOST_UID-1000}
+        - GID=${HOST_GID-1000}
+      context: ../../
+      dockerfile: environments/Dockerfile.frontend
+    tty: true
+    volumes:
+        - ../../applications/frontend:/home/challenger/frontend
+    ports:
+        - 8501:8501
