@@ -1,3 +1,12 @@
+APPLICATION_PORT := 8000
+GUNICORN_TIMEOUT := 60
+LOGLEVEL := info
+
+
+.PHONY: run-backend
+run-backend:
+	poetry run gunicorn 'src.app:main' -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$(APPLICATION_PORT) -t $(GUNICORN_TIMEOUT) --log-level $(LOGLEVEL) 
+
 .PHONY: black-check
 black-check:
 	poetry run black --check src tests
