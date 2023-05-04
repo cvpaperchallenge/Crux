@@ -84,7 +84,7 @@ jobs:
 
       - name: Build docker image
         if: ${{ env.USE_CACHE != 'true' }}
-        run: docker compose build --parallel core
+        run: docker compose build
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
       - name: Pull Docker image
