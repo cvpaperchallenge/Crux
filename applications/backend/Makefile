@@ -7,6 +7,10 @@ LOGLEVEL := info
 run-backend:
 	poetry run gunicorn 'src.app:main' -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$(APPLICATION_PORT) -t $(GUNICORN_TIMEOUT) --log-level $(LOGLEVEL) 
 
+.PHONY: healthcheck
+healthcheck:
+	curl http://localhost:$(APPLICATION_PORT)/health
+
 .PHONY: black-check
 black-check:
 	poetry run black --check src tests

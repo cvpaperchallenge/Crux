@@ -102,18 +102,38 @@ jobs:
       - name: Change permission
         run: chmod 777 .
 
-      # In the built stage of Docker image, .venv dir is moved from working directory to prevent
-      # overwrite by volume operation of Docker. Here, .venv is moved back to working directory.
-      - name: Move .venv directory
-        run: docker compose exec -T core mv ../.venv .
+      # In the built stage of Docker image, .venv dir is moved from the working directory to prevent
+      # from being overwritten by volume operation of Docker. Here, .venv is moved back to working directory.
+      - name: Move back the backend .venv directory
+        run: docker compose exec -T backend mv ../.venv .
+        working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
+      - name: Move back the frontend .venv directory
+        run: docker compose exec -T frontend mv ../.venv .
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
-      - name: Run lint
-        run: docker compose exec -T core make lint
+      - name: Run lint for the backend service
+        run: docker compose exec -T backend make lint
+        working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
+      - name: Run lint for the frontend service
+        run: docker compose exec -T frontend make lint
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
-      - name: Run test code
-        run: docker compose exec -T core make test
+      - name: Run test code for the backend service
+        run: docker compose exec -T backend make test
+        working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
+      - name: Run test code for the frontend service
+        run: docker compose exec -T frontend make test
+        working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
+
+      - name: Start the backend service
+        run: docker compose exec -T backend make run-frontend
+        working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
+      - name: Start the frontend service
+        run: docker compose exec -T frontend make run-frontend
+        working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
+
+      - name: Helth check the backend service
+        run: docker compose exec -T backend make healthcheck
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
         # Temp fix
