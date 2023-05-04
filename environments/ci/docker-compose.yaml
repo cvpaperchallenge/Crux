@@ -11,6 +11,8 @@ services:
     tty: true
     volumes:
         - ../../applications/backend:/home/challenger/backend
+    ports:
+        - 8000:8000
   
   frontend:
     image: localhost:5000/frontend:${DOCKER_IMAGE_TAG_CI}
@@ -22,3 +24,5 @@ services:
     tty: true
     volumes:
         - ../../applications/frontend:/home/challenger/frontend
+    ports:
+        - 8501:8501
