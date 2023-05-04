@@ -10,14 +10,14 @@ env:
 
 jobs:
   lint-and-test:
-    name: ${{ matrix.os }} / ${{ matrix.python-version }}
+    name: ${{ matrix.os }}
     runs-on: ${{ matrix.image }}
     timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu]
-        python-version: ["3.8", "3.9"]
+        python-version: ["3.10"]
         include:
           - os: ubuntu
             image: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
         if: ${{ env.USE_CACHE == 'true' }}
         uses: actions/cache@v3
         with:
-          path: /tmp/.buildx-cache/${{ matrix.python-version }}
+          path: /tmp/.buildx-cache
           key: buildx-${{ github.ref }}-${{ github.sha }}
           restore-keys: |
             buildx-${{ github.ref }}
@@ -49,7 +49,7 @@ jobs:
         if: ${{ env.USE_CACHE == 'true' }}
         uses: actions/cache@v3
         with:
-          path: /tmp/docker-registry/${{ matrix.python-version }}
+          path: /tmp/docker-registry
           key: docker-registry-${{ github.ref }}-${{ github.sha }}
           restore-keys: |
             docker-registry-${{ github.ref }}
@@ -76,16 +76,15 @@ jobs:
         run: |
           docker buildx bake \
           --builder="${{ steps.buildx.outputs.name }}" \
-          --set="core.args.PYTHON_VERSION=${{ matrix.python-version }}" \
-          --set="*.cache-from=type=local,src=/tmp/.buildx-cache/${{ matrix.python-version }}" \
-          --set="*.cache-to=type=local,dest=/tmp/.buildx-cache-new/${{ matrix.python-version }}" \
+          --set="*.cache-from=type=local,src=/tmp/.buildx-cache" \
+          --set="*.cache-to=type=local,dest=/tmp/.buildx-cache-new" \
           --push \
           -f docker-compose.yaml
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
       - name: Build docker image
         if: ${{ env.USE_CACHE != 'true' }}
-        run: docker-compose build --parallel --build-arg PYTHON_VERSION=${{ matrix.python-version }} core
+        run: docker-compose build --parallel core
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
       - name: Pull Docker image
