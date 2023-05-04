@@ -59,7 +59,7 @@ jobs:
         if: ${{ env.USE_CACHE == 'true' }}
         run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2
       
-      - name: Wait for Docker registry
+      - name: Wait for the Docker registry to boot
         if: ${{ env.USE_CACHE == 'true' }}
         run: npx wait-on --httpTimeout 30000 tcp:5000
 
@@ -71,7 +71,7 @@ jobs:
             echo TAG $TAG
             echo "::set-output name=docker_image_tag_ci::$TAG"
 
-      - name: Build docker image with cache
+      - name: Build Docker image with cache and push it to the local registry
         if: ${{ env.USE_CACHE == 'true' }}
         run: |
           docker buildx bake \
@@ -82,17 +82,17 @@ jobs:
           -f docker compose.yaml
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
-      - name: Build docker image
+      - name: Build Docker image if the cache is not used
         if: ${{ env.USE_CACHE != 'true' }}
         run: docker compose build
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
-      - name: Pull Docker image
+      - name: Pull Docker image from the local registry
         if: ${{ env.USE_CACHE == 'true' }}
         run: docker compose pull
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
-      - name: Create and start docker container
+      - name: Create and start Docker container
         run: docker compose up --no-build -d
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
