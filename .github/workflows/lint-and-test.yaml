@@ -79,7 +79,7 @@ jobs:
           --set="*.cache-from=type=local,src=/tmp/.buildx-cache" \
           --set="*.cache-to=type=local,dest=/tmp/.buildx-cache-new" \
           --push \
-          -f docker compose.yaml
+          -f docker-compose.yaml
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
       - name: Build Docker image if the cache is not used
