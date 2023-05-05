@@ -28,6 +28,11 @@ jobs:
       - name: Check version info
         run: pwd && docker compose --version && docker --version
 
+      - name: Get UID and GID
+        run: |
+          echo "UID=$(id -u)" >> $GITHUB_ENV
+          echo "GID=$(id -g)" >> $GITHUB_ENV
+
       - name: Set up Docker Buildx
         if: ${{ env.USE_CACHE == 'true' }}
         id: buildx
@@ -76,6 +81,8 @@ jobs:
         run: |
           docker buildx bake \
           --builder="${{ steps.buildx.outputs.name }}" \
+          --set="*.args.UID=${{ env.UID }}" \
+          --set="*.args.GID=${{ env.GID }}" \
           --set="*.cache-from=type=local,src=/tmp/.buildx-cache" \
           --set="*.cache-to=type=local,dest=/tmp/.buildx-cache-new" \
           --push \
