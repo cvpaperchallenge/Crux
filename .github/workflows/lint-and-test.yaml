@@ -74,7 +74,7 @@ jobs:
             TAG=$(TZ=UTC-9 date '+%Y%m')-${SHA:0:7}
             echo "DOCKER_IMAGE_TAG_CI=$TAG" >> $GITHUB_ENV
             echo TAG $TAG
-            echo "::set-output name=docker_image_tag_ci::$TAG"
+            echo "docker_image_tag_ci=$TAG" >> $GITHUB_OUTPUT
 
       - name: Build Docker image with cache and push it to the local registry
         if: ${{ env.USE_CACHE == 'true' }}
