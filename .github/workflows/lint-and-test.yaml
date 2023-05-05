@@ -133,10 +133,10 @@ jobs:
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
       - name: Start the backend service
-        run: docker compose exec -T backend make run-backend
+        run: docker compose exec -T backend make run-backend &
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
       - name: Start the frontend service
-        run: docker compose exec -T frontend make run-frontend
+        run: docker compose exec -T frontend make run-frontend &
         working-directory: ${{ env.DOCKER_COMPOSE_DIRECTORY }}
 
       - name: Helth check the backend service
