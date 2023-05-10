@@ -1,10 +1,10 @@
 from typing import Final, Literal
 
 import fastapi
-from fastapi.responses import JSONResponse
+from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel, SecretStr
 
-router: Final = fastapi.APIRouter()
+router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
 
 
 class Health(BaseModel):
@@ -19,7 +19,7 @@ class UserOut(BaseModel):
     summary: str
 
 @router.get("/health", response_model=Health)
-async def health() -> JSONResponse:
+async def health() -> ORJSONResponse:
     """Endpoint for health check.
 
     Returns:
@@ -28,10 +28,10 @@ async def health() -> JSONResponse:
 
 
     """
-    return JSONResponse({"health": "ok"})
+    return ORJSONResponse({"health": "ok"})
 
 @router.post("/summarize", response_model=UserOut)
-async def summarize(user_input: UserIn) -> JSONResponse:
+async def summarize(user_input: UserIn) -> ORJSONResponse:
     """Endpoint for summarizing paper PDFs.
 
     Returns:
@@ -40,4 +40,4 @@ async def summarize(user_input: UserIn) -> JSONResponse:
 
 
     """
-    return JSONResponse({"summary": "This is a summary"})
+    return ORJSONResponse({"summary": "This is a summary"})
