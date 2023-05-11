@@ -3,20 +3,11 @@ from typing import Final, Literal
 import fastapi
 from fastapi.responses import ORJSONResponse
 from fastapi import UploadFile
-from pydantic import BaseModel, SecretStr
+from pydantic import SecretStr
+
+from src.dto import Health, UserIn, UserOut
 
 router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
-
-
-class Health(BaseModel):
-    health: str
-
-class UserIn(BaseModel):
-    openai_key: SecretStr
-    summary_format: Literal['normal', 'three-point', 'ochiai', 'cvpaper']
-
-class UserOut(BaseModel):
-    summary: str
 
 @router.get("/health", response_model=Health)
 async def health() -> ORJSONResponse:
