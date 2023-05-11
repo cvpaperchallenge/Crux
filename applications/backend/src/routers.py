@@ -13,7 +13,7 @@ class Health(BaseModel):
 class UserIn(BaseModel):
     parsed_pdf: dict
     openai_key: SecretStr
-    summary_type: Literal['normal', 'ochiai']
+    summary_format: Literal['normal', 'three-point', 'ochiai', 'cvpaper']
 
 class UserOut(BaseModel):
     summary: str
