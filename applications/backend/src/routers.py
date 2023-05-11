@@ -2,6 +2,7 @@ from typing import Final, Literal
 
 import fastapi
 from fastapi.responses import ORJSONResponse
+from fastapi import UploadFile
 from pydantic import BaseModel, SecretStr
 
 router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
@@ -11,7 +12,6 @@ class Health(BaseModel):
     health: str
 
 class UserIn(BaseModel):
-    parsed_pdf: dict
     openai_key: SecretStr
     summary_format: Literal['normal', 'three-point', 'ochiai', 'cvpaper']
 
@@ -31,7 +31,7 @@ async def health() -> ORJSONResponse:
     return ORJSONResponse({"health": "ok"})
 
 @router.post("/summarize", response_model=UserOut)
-async def summarize(user_input: UserIn) -> ORJSONResponse:
+async def summarize(pdf_file: UploadFile, openai_key:  SecretStr, summary_type: Literal['normal', 'ochiai']) -> ORJSONResponse:
     """Endpoint for summarizing paper PDFs.
 
     Returns:
@@ -40,4 +40,5 @@ async def summarize(user_input: UserIn) -> ORJSONResponse:
 
 
     """
+    user_in = UserIn(openai_key, summary_type)
     return ORJSONResponse({"summary": "This is a summary"})
