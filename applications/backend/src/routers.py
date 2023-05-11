@@ -6,6 +6,7 @@ from fastapi import UploadFile
 from pydantic import SecretStr
 
 from src.dto import Health, UserIn, UserOut
+from src.controller import SummaryController
 
 router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
 
@@ -32,4 +33,4 @@ async def summarize(pdf_file: UploadFile, openai_key:  SecretStr, summary_format
 
     """
     user_in = UserIn(openai_key=openai_key, summary_format=summary_format)
-    return ORJSONResponse({"summary": "This is a summary"})
+    return ORJSONResponse({"summary": SummaryController().summarize(pdf_file, user_in.openai_key, user_in.summary_format)})
