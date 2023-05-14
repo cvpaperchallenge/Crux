@@ -1,3 +1,4 @@
+from src.core_logic import BaseSummarizeHandler
 
 class SummarizeHandler:    
     def normal_summary(self, parsed_pdf, openai_key):
