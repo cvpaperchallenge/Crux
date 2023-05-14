@@ -1,11 +1,11 @@
 from src.summarize_paper import SummarizeHandler
 
 class SummaryController:
-    def load_pdf(self, pdf_file) -> dict:
+    def parse_pdf(self, pdf_file) -> dict:
         return {"content": "This is a long text"}
     
     def summarize(self, pdf_file, openai_key, summary_format) -> dict:
-        parsed_pdf = self.load_pdf(pdf_file)
+        parsed_pdf = self.parse_pdf(pdf_file)
         match summary_format:
             case "normal":
                 # TODO: Prepare the data needed for a normal summary.
