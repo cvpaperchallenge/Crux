@@ -51,7 +51,7 @@ profile = "black"
 line_length = 88
 
 [tool.mypy]
-python_version = 3.10
+python_version = "3.10"
 # following setting is same as pysen
 # https://github.com/pfnet/pysen/blob/main/setup.cfg#L12
 check_untyped_defs = true
