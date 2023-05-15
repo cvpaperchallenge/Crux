@@ -20,10 +20,10 @@ async def health() -> ORJSONResponse:
 
 
     """
-    return ORJSONResponse({"health": "ok"})
+    return {"health": "ok"}
 
 @router.post("/summarize", response_model=UserOut)
-async def summarize(pdf_file: UploadFile, openai_key:  SecretStr, summary_format: Literal['normal', 'three-point', 'ochiai', 'cvpaper']) -> ORJSONResponse:
+async def summarize(pdf_file: UploadFile, openai_key: SecretStr, summary_format: Literal['normal', 'three-point', 'ochiai', 'cvpaper']) -> ORJSONResponse:
     """Endpoint for summarizing paper PDFs.
 
     Returns:
@@ -33,4 +33,4 @@ async def summarize(pdf_file: UploadFile, openai_key:  SecretStr, summary_format
 
     """
     user_in = UserIn(openai_key=openai_key, summary_format=summary_format)
-    return ORJSONResponse({"summary": SummaryController().summarize(pdf_file, user_in.openai_key, user_in.summary_format)})
+    return {"title": SummaryController().summarize(pdf_file, user_in.openai_key, user_in.summary_format)}
