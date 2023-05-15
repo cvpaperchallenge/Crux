@@ -1,4 +1,4 @@
-from typing import Literal, TypeAlias
+from typing import Literal
 from pydantic import BaseModel, SecretStr
 
 class Health(BaseModel):
@@ -26,8 +26,6 @@ class FormatCVPaper(BaseModel):
     results: str
     others: str
 
-SummaryFormat: TypeAlias = FormatNormal | FormatThreePoint | FormatOchiai | FormatCVPaper
-
 class UserIn(BaseModel):
     openai_key: SecretStr
     summary_format: Literal['normal', 'three-point', 'ochiai', 'cvpaper']
@@ -36,4 +34,4 @@ class UserOut(BaseModel):
     title: str
     author: str
     key_figure: str
-    summary_text: SummaryFormat
+    summary_text: str
