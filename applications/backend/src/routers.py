@@ -2,8 +2,8 @@ from typing import Final, Literal
 
 import fastapi
 from fastapi.responses import ORJSONResponse
-from fastapi import UploadFile
-from pydantic import SecretStr
+from fastapi import UploadFile, Form, File
+from pydantic import SecretStr, Json
 
 from src.dto import Health, UserIn, UserOut
 from src.controller import SummaryController
@@ -22,7 +22,7 @@ async def health() -> ORJSONResponse:
     """
     return {"health": "ok"}
 
-@router.post("/summarize", response_model=UserOut)
+@router.post("/summarize_1", response_model=UserOut)
 async def summarize(pdf_file: UploadFile, openai_key: SecretStr, summary_format: Literal['normal', 'three-point', 'ochiai', 'cvpaper']) -> ORJSONResponse:
     """Endpoint for summarizing paper PDFs.
 
@@ -33,4 +33,27 @@ async def summarize(pdf_file: UploadFile, openai_key: SecretStr, summary_format:
 
     """
     user_in = UserIn(openai_key=openai_key, summary_format=summary_format)
-    return {"title": SummaryController().summarize(pdf_file, user_in.openai_key, user_in.summary_format)}
+    return {
+        "title": "This is the paper title.",
+        "author": "John Due",
+        "key_figure": "fig-#",
+        "summary_text": SummaryController().summarize(pdf_file, user_in)
+    }
+
+
+@router.post("/summarize_2", response_model=UserOut)
+async def summarize(pdf_file: UploadFile = File(...), user_in: Json[UserIn] = Form(...)) -> ORJSONResponse:
+    """Endpoint for summarizing paper PDFs.
+
+    Returns:
+
+    - JSONResponse: A response from endpoint.
+
+
+    """
+    return {
+        "title": "This is the paper title.",
+        "author": "John Doe",
+        "key_figure": "fig-#",
+        "summary_text": SummaryController().summarize(pdf_file, user_in)
+    }

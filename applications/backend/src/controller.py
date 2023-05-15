@@ -1,10 +1,13 @@
 from src.summarize_paper import SummarizeHandler
+from src.dto import UserIn
 
 class SummaryController:
     def parse_pdf(self, pdf_file) -> dict:
         return {"content": "This is a long text"}
     
-    def summarize(self, pdf_file, openai_key, summary_format) -> dict:
+    def summarize(self, pdf_file, user_input: UserIn) -> dict:
+        openai_key = user_input.openai_key
+        summary_format = user_input.summary_format
         parsed_pdf = self.parse_pdf(pdf_file)
         match summary_format:
             case "normal":
