@@ -1,4 +1,4 @@
-from typing import Final, Literal
+from typing import Final, Literal, Any
 
 import fastapi
 from fastapi.responses import ORJSONResponse
@@ -11,7 +11,7 @@ from src.controller import SummaryController
 router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
 
 @router.get("/health", response_model=Health)
-async def health() -> ORJSONResponse:
+async def health() -> dict[str, str]:
     """Endpoint for health check.
 
     Returns:
@@ -23,7 +23,7 @@ async def health() -> ORJSONResponse:
     return {"health": "ok"}
 
 @router.post("/summarize_1", response_model=UserOut)
-async def summarize(pdf_file: UploadFile, openai_key: SecretStr, summary_format: Literal['normal', 'three-point', 'ochiai', 'cvpaper']) -> ORJSONResponse:
+async def summarize_1(pdf_file: UploadFile, openai_key: SecretStr, summary_format: Literal['normal', 'three-point', 'ochiai', 'cvpaper']) -> dict[str, Any]:
     """Endpoint for summarizing paper PDFs.
 
     Returns:
@@ -42,7 +42,7 @@ async def summarize(pdf_file: UploadFile, openai_key: SecretStr, summary_format:
 
 
 @router.post("/summarize_2", response_model=UserOut)
-async def summarize(pdf_file: UploadFile = File(...), user_in: Json[UserIn] = Form(...)) -> ORJSONResponse:
+async def summarize_2(pdf_file: UploadFile = File(...), user_in: Json[UserIn] = Form(...)) -> dict[str, Any]:
     """Endpoint for summarizing paper PDFs.
 
     Returns:
