@@ -32,6 +32,7 @@ pydantic = "^1.10.7"
 fastapi = "^0.95.1"
 orjson = "^3.8.12"
 python-multipart = "^0.0.6"
+httpx = "^0.24.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"
