@@ -19,7 +19,7 @@ class SummaryController:
             case "three-point":
                 bare_three_point_summary = SummarizeHandler().three_point_summary(parsed_pdf, openai_key)
                 # TODO: Prepare the data needed for a three point summary.
-                return "This is a three point summary."
+                return "This is a three-point summary."
             case "ochiai":
                 bare_ochiai_summary = SummarizeHandler().ochiai_summary(parsed_pdf, openai_key)
                 # TODO: Prepare the data needed for a ochiai summary.
