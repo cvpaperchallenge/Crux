@@ -37,7 +37,7 @@ persist_directory = "src/botany/db"
 pdf_path = "data/RLTutor_ Reinforcement Learning Based Adaptive Tutoring System.pdf"
 
 # Define parameters
-llm_model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+chat_model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
 chunk_size = 1000
 chunk_overlap = 50
 top_k = 5
@@ -57,7 +57,7 @@ text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
 documents = text_splitter.split_documents(documents=raw_documents)
 
 # Summarize a document chunk-wise first, then summarize those summaries in a single summary
-chain = load_summarize_chain(llm=llm_model, chain_type="map_reduce", verbose=True)
+chain = load_summarize_chain(llm=chat_model, chain_type="map_reduce", verbose=True)
 sumamry = chain.run(documents)
 
 print(sumamry)
