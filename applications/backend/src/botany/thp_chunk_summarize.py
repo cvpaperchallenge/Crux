@@ -62,10 +62,6 @@ text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
 )
 documents = text_splitter.split_documents(documents=raw_documents)
 
-# # Summarize a document chunk-wise first, then summarize those summaries in a single summary
-# chain = load_summarize_chain(llm=llm_model, chain_type="map_reduce", verbose=True)
-# sumamry = chain.run(documents)
-
 # The chain to make summaries by mapping over the documents chunk-wise
 chunk_wise_summary_chain = LLMChain(llm=chat_model, prompt=map_reduce_prompt.PROMPT, verbose=True)
 
@@ -106,9 +102,6 @@ map_chain = MapReduceDocumentsChain(
     verbose=True
 )
 
-# # Generate a three-point summary
-# sumamry = map_chain.run(documents)
-
 # The template to parse the output
 parse_template = """The original output is as follows:
 
@@ -132,10 +125,6 @@ parse_chain = LLMChain(llm=llm_model, prompt=parse_prompt, verbose=True)
 # Generate a three-point summary
 overall_chain = SimpleSequentialChain(chains=[map_chain, parse_chain], verbose=True)
 summary = overall_chain.run(documents)
-
-# # Parse the output
-# _input = parse_prompt.format_prompt(output=sumamry)
-# parsed_summary = llm_model(_input.to_string())
 
 # Parse the output
 parsed_summary = parser.parse(summary)
