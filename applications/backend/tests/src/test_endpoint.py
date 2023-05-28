@@ -34,7 +34,7 @@ def test_summarize_1(
         assert response.status_code == http.HTTPStatus.OK
         assert response.json() == {
             "title": "This is the paper title.",
-            "author": "John Due",
+            "author": "John Doe",
             "key_figure": "fig-#",
             "summary_text": "This is a {} summary.".format(summary_format),
         }

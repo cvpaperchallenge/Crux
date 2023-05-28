@@ -22,7 +22,7 @@ class SummaryController:
                 # TODO: Prepare the data needed for a normal summary.
                 return {
                     "title": "This is the paper title.",
-                    "author": "John Due",
+                    "author": "John Doe",
                     "key_figure": "fig-#",
                     "summary_text": bare_normal_summary,
                 }
@@ -33,7 +33,7 @@ class SummaryController:
                 # TODO: Prepare the data needed for a three point summary.
                 return {
                     "title": "This is the paper title.",
-                    "author": "John Due",
+                    "author": "John Doe",
                     "key_figure": "fig-#",
                     "summary_text": bare_three_point_summary,
                 }
@@ -44,7 +44,7 @@ class SummaryController:
                 # TODO: Prepare the data needed for a ochiai summary.
                 return {
                     "title": "This is the paper title.",
-                    "author": "John Due",
+                    "author": "John Doe",
                     "key_figure": "fig-#",
                     "summary_text": bare_ochiai_summary,
                 }
@@ -55,7 +55,7 @@ class SummaryController:
                 # TODO: Prepare the data needed for a cvpaper summary.
                 return {
                     "title": "This is the paper title.",
-                    "author": "John Due",
+                    "author": "John Doe",
                     "key_figure": "fig-#",
                     "summary_text": bare_cvpaper_summary,
                 }
