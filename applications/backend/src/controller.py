@@ -1,6 +1,8 @@
+from typing import Any
+
 from fastapi import UploadFile
 
-from src.dto import UserIn, UserOut
+from src.dto import UserIn
 from src.summarize_paper import SummarizeHandler
 
 
@@ -8,7 +10,7 @@ class SummaryController:
     def parse_pdf(self, pdf_file: UploadFile) -> dict[str, str]:
         return {"content": "This is a long text"}
 
-    def summarize(self, pdf_file: UploadFile, user_input: UserIn) -> UserOut:
+    def summarize(self, pdf_file: UploadFile, user_input: UserIn) -> dict[str, Any]:
         openai_key = user_input.openai_key
         summary_format = user_input.summary_format
         parsed_pdf = self.parse_pdf(pdf_file)
