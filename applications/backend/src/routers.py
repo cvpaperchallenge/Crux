@@ -36,12 +36,7 @@ async def summarize_1(
 
 
     """
-    return {
-        "title": "This is the paper title.",
-        "author": "John Due",
-        "key_figure": "fig-#",
-        "summary_text": SummaryController().summarize(pdf_file, user_in),
-    }
+    return SummaryController().summarize(pdf_file, user_in)
 
 
 @router.post("/summarize_2", response_model=UserOut)
@@ -56,9 +51,4 @@ async def summarize_2(
 
 
     """
-    return {
-        "title": "This is the paper title.",
-        "author": "John Doe",
-        "key_figure": "fig-#",
-        "summary_text": SummaryController().summarize(pdf_file, user_in),
-    }
+    return SummaryController().summarize(pdf_file, user_in)
