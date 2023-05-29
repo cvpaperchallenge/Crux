@@ -17,7 +17,7 @@ from langchain.memory import VectorStoreRetrieverMemory
 # langchain Indexes
 from langchain.document_loaders import PyMuPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import Chroma
+from langchain.vectorstores import Chroma, FAISS
 # from langchain.indexes import VectorstoreIndexCreator
 from langchain.embeddings.openai import OpenAIEmbeddings
 
