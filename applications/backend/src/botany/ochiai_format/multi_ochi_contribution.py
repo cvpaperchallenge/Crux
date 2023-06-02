@@ -15,7 +15,7 @@ from langchain.memory import VectorStoreRetrieverMemory
 
 
 # langchain Indexes
-from langchain.document_loaders import PyMuPDFLoader
+from langchain.document_loaders import PyMuPDFLoader, MathpixPDFLoader
 from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
 from langchain.vectorstores import Chroma, FAISS
 # from langchain.indexes import VectorstoreIndexCreator
@@ -46,7 +46,9 @@ top_k = 5
 search_type = "similarity" # "similarity", "similarity_score_threshold", "mmr"
 
 # Load a pdf document
-loader = PyMuPDFLoader(file_path=pdf_path)
+# loader = PyMuPDFLoader(file_path=pdf_path)
+# raw_documents = loader.load()
+loader = MathpixPDFLoader(file_path=pdf_path)
 raw_documents = loader.load()
 
 # Split documents into chunks with some overlap
