@@ -16,7 +16,7 @@ from langchain.memory import VectorStoreRetrieverMemory
 
 # langchain Indexes
 from langchain.document_loaders import PyMuPDFLoader, MathpixPDFLoader, TextLoader
-from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
+from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter, RecursiveCharacterTextSplitter, Language
 from langchain.vectorstores import Chroma, FAISS
 # from langchain.indexes import VectorstoreIndexCreator
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -31,6 +31,7 @@ from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 from dotenv import load_dotenv
 from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
 from src.botany.ochiai_format.latex_splitter import LatexSplitter
+from src.botany.ochiai_format.custom_mathpix_loader import CustomMathpixLoader
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -40,7 +41,7 @@ persist_directory = "src/botany/db"
 # pdf_path = "data/RLTutor_ Reinforcement Learning Based Adaptive Tutoring System.pdf"
 # pdf_path = "data/Qiu_Graph_Representation_for_Order-Aware_Visual_Transformation_CVPR_2023_paper.pdf"
 # pdf_path = "data/Takashima_Visual_Atoms_Pre-Training_Vision_Transformers_With_Sinusoidal_Waves_CVPR_2023_paper.pdf"
-txt_path = "data/rltutor_latex.txt"
+txt_path = "data/RLTutor_ Reinforcement Learning Based Adaptive Tutoring System.txt"
 
 # Define parameters
 chunk_size = 200
@@ -50,17 +51,24 @@ search_type = "similarity" # "similarity", "similarity_score_threshold", "mmr"
 
 # Load a pdf document
 # loader = PyMuPDFLoader(file_path=pdf_path)
-# raw_documents = loader.load()
 # loader = MathpixPDFLoader(file_path=pdf_path)
-# raw_documents = loader.load()
+# loader = CustomMathpixLoader(
+#     file_path=txt_path,
+#     other_request_parameters={"math_inline_delimiters": ["$", "$"], "math_display_delimiters": ["$$", "$$"]},
+# )
 loader = TextLoader(file_path=txt_path)
 raw_documents = loader.load()
+# for doc in raw_documents:
+#     print(doc.page_content)
 
 # Split documents into chunks with some overlap
 # text_splitter = TokenTextSplitter.from_tiktoken_encoder(
 #     model_name="gpt-3.5-turbo", # "text-embedding-ada-002"
 #     chunk_size = chunk_size,
 #     chunk_overlap = chunk_overlap
+# )
+# latex_splitter = RecursiveCharacterTextSplitter.from_language(
+#     language=Language.LATEX, chunk_size=chunk_size, chunk_overlap=chunk_overlap
 # )
 latex_splitter = LatexSplitter.from_language(
     chunk_size=200, chunk_overlap=40

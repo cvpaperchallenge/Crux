@@ -12,6 +12,24 @@ from typing import (
     Union,
 )
 
+
+def _split_text(text: str, separator: str, keep_separator: bool) -> List[str]:
+    # Now that we have the separator, split the text
+    if separator:
+        if keep_separator:
+            # The parentheses in the pattern keep the delimiters in the result.
+            _splits = re.split(f"({separator})", text)
+            splits = [_splits[i] + _splits[i + 1] for i in range(1, len(_splits), 2)]
+            if len(_splits) % 2 == 0:
+                splits += _splits[-1:]
+            splits = [_splits[0]] + splits
+        else:
+            splits = text.split(separator)
+    else:
+        splits = list(text)
+    return [s for s in splits if s != ""]
+
+
 class LatexSplitter(TextSplitter):
     """
     Split the input text in the same way as RecursiveCharacterTextSplitter, but not based on the text length but on the token length.
@@ -22,11 +40,10 @@ class LatexSplitter(TextSplitter):
         model_name: Optional[str] = None,
         allowed_special: Union[Literal["all"], AbstractSet[str]] = set(),
         disallowed_special: Union[Literal["all"], Collection[str]] = "all",
-        keep_separator: bool = True,
         **kwargs: Any,
     ):
         """Create a new TextSplitter."""
-        super().__init__(**kwargs, keep_separator=keep_separator, )
+        super().__init__(**kwargs)
         try:
             import tiktoken
         except ImportError:
@@ -45,13 +62,14 @@ class LatexSplitter(TextSplitter):
         self._disallowed_special = disallowed_special
         self.separators = [
             # First, try to split along Latex sections
+            "\\title{",
+            "\n\\author{",
             "\n\\chapter{",
             "\n\\section{",
             "\n\\subsection{",
             "\n\\subsubsection{",
-            "\n\\title{",
-            "\n\\author{",
             # Now split by environments
+            "\n\\begin{abstract}",
             "\n\\begin{enumerate}",
             "\n\\begin{itemize}",
             "\n\\begin{description}",
@@ -60,12 +78,9 @@ class LatexSplitter(TextSplitter):
             "\n\\begin{quotation}",
             "\n\\begin{verse}",
             "\n\\begin{verbatim}",
-            "\n\\begin{abstract}",
             ## Now split by math environments
-            "\n\\begin{align}",
-            "\n\\begin{aligned}",
-            "\\[", # $$
-            "\\(", # $
+            "$$",
+            # "$",
             # # Now split by the normal type of lines
             # " ",
             "",
@@ -112,26 +127,6 @@ class LatexSplitter(TextSplitter):
     
     def _split_token(self, chunks: str) -> List[str]:
         """Split each incoming latex chunk into multiple chunks based on the token length."""
-        # final_chunks = []
-        # for chunk in chunks:
-        #     tokens = self._tokenizer.tokenize(chunk)
-        #     if len(tokens) > self._chunk_size:
-        #         _good_splits = []
-        #         for token in tokens:
-        #             if self._length_function(token) < self._chunk_size:
-        #                 _good_splits.append(token)
-        #             else:
-        #                 if _good_splits:
-        #                     merged_text = self._merge_splits(_good_splits, "")
-        #                     final_chunks.extend(merged_text)
-        #                     _good_splits = []
-        #                 final_chunks.append(token)
-        #         if _good_splits:
-        #             merged_text = self._merge_splits(_good_splits, "")
-        #             final_chunks.extend(merged_text)
-        #     else:
-        #         final_chunks.append(chunk)
-        # return final_chunks
         splits = []
         for text in chunks:
             input_ids = self._tokenizer.encode(
