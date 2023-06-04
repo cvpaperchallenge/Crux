@@ -32,6 +32,7 @@ from dotenv import load_dotenv
 from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
 from src.botany.ochiai_format.format_template import OCHI_STRENGTH_QUERY, OCHI_METHOD_QUERY, OCHI_EVAL_QUERY, OCHI_DISCUSSION_QUERY, \
     OCHI_STRENGTH_TEMPLATE, OCHI_METHOD_TEMPLATE, OCHI_EVAL_TEMPLATE, OCHI_DISCUSSION_TEMPLATE
+from src.botany.ochiai_format.latex_splitter import LatexSplitter
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -56,11 +57,15 @@ search_type = "similarity" # "similarity", "similarity_score_threshold", "mmr"
 loader = TextLoader(file_path=txt_path)
 raw_documents = loader.load()
 
-text_splitter = TokenTextSplitter.from_tiktoken_encoder(
-    model_name="gpt-3.5-turbo", # "text-embedding-ada-002"
-    chunk_size = chunk_size,
-    chunk_overlap = chunk_overlap
+# text_splitter = TokenTextSplitter.from_tiktoken_encoder(
+#     model_name="gpt-3.5-turbo", # "text-embedding-ada-002"
+#     chunk_size = chunk_size,
+#     chunk_overlap = chunk_overlap
+# )
+text_splitter = LatexSplitter.from_language(
+    chunk_size=200, chunk_overlap=40
 )
+
 documents = text_splitter.split_documents(documents=raw_documents)
 
 # Create the vector store by embedding input texts
