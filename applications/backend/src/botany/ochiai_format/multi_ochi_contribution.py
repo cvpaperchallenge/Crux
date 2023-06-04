@@ -67,14 +67,14 @@ raw_documents = loader.load()
 #     chunk_size = chunk_size,
 #     chunk_overlap = chunk_overlap
 # )
-# latex_splitter = RecursiveCharacterTextSplitter.from_language(
+# text_splitter = RecursiveCharacterTextSplitter.from_language(
 #     language=Language.LATEX, chunk_size=chunk_size, chunk_overlap=chunk_overlap
 # )
-latex_splitter = LatexSplitter.from_language(
+text_splitter = LatexSplitter.from_language(
     chunk_size=200, chunk_overlap=40
 )
 
-documents = latex_splitter.split_documents(documents=raw_documents)
+documents = text_splitter.split_documents(documents=raw_documents)
 
 # Create the vector store by embedding input texts
 embeddings = OpenAIEmbeddings()
