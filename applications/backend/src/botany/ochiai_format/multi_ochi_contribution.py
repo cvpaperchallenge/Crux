@@ -105,11 +105,11 @@ If it contains only irrelevant content, return "Nothing".
 
 Output:"""
 
-combine_template = """Write a 50-word summary comparing this study and previous studies based on the given <CONTRIBUTION> and <PROBLEMS>:
+combine_template = """Write a 50-word summary of what makes this study superior to previous studies based on the given <CONTRIBUTION OF THIS STUDY> and <PROBLEMS OF PREVIOUS STUDIES>:
 
 
-<CONTRIBUTION>: "{contribution}"
-<PROBLEMS>: "{problems}"
+<CONTRIBUTION OF THIS STUDY>: "{contribution}"
+<PROBLEMS OF PREVIOUS STUDIES>: "{problems}"
 
 
 Output: """
