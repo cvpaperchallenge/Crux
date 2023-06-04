@@ -15,7 +15,7 @@ from langchain.memory import VectorStoreRetrieverMemory
 
 
 # langchain Indexes
-from langchain.document_loaders import PyMuPDFLoader
+from langchain.document_loaders import PyMuPDFLoader, TextLoader
 from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
 from langchain.vectorstores import Chroma, FAISS
 # from langchain.indexes import VectorstoreIndexCreator
@@ -38,18 +38,19 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Define paths
 persist_directory = "src/botany/db"
-pdf_path = "data/RLTutor_ Reinforcement Learning Based Adaptive Tutoring System.pdf"
+# pdf_path = "data/RLTutor_ Reinforcement Learning Based Adaptive Tutoring System.pdf"
+txt_path = "data/rltutor_latex.txt"
 
 # Define parameters
-chat_model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
-llm_model = OpenAIChat(model_name="gpt-3.5-turbo")
 chunk_size = 200
 chunk_overlap = 40
 top_k = 10
 search_type = "similarity" # "similarity", "similarity_score_threshold", "mmr"
 
 # Load a pdf document
-loader = PyMuPDFLoader(file_path=pdf_path)
+# loader = PyMuPDFLoader(file_path=pdf_path)
+# raw_documents = loader.load()
+loader = TextLoader(file_path=txt_path)
 raw_documents = loader.load()
 
 text_splitter = TokenTextSplitter.from_tiktoken_encoder(
@@ -70,11 +71,14 @@ vectorstore = FAISS.from_documents(
 # Define a retriever
 retriever = vectorstore.as_retriever(serch_type=search_type, search_kwargs={"k": top_k})
 
-for save_name, query, template in zip(
-    ["strength", "method", "evaluation", "discussion"],
-    [OCHI_STRENGTH_QUERY, OCHI_METHOD_QUERY, OCHI_EVAL_QUERY, OCHI_DISCUSSION_QUERY],
-    [OCHI_STRENGTH_TEMPLATE, OCHI_METHOD_TEMPLATE, OCHI_EVAL_TEMPLATE, OCHI_DISCUSSION_TEMPLATE]
-    ):
+# Generate method, evaluation, discussion for ochiai format
+for i, (save_name, query, template) in enumerate(zip(
+    ["method", "evaluation", "discussion"],
+    [OCHI_METHOD_QUERY, OCHI_EVAL_QUERY, OCHI_DISCUSSION_QUERY],
+    [OCHI_METHOD_TEMPLATE, OCHI_EVAL_TEMPLATE, OCHI_DISCUSSION_TEMPLATE]
+    )):
+    llm_model = OpenAIChat(model_name="gpt-3.5-turbo")
+    
     # Get top-k relevant documents
     result = retriever.get_relevant_documents(query)
 
@@ -90,10 +94,93 @@ for save_name, query, template in zip(
         verbose=True,
     )
 
-    strength = combine_document_chain.run(result)
+    output = combine_document_chain.run(result)
 
     # Save the result to a txt file
-    with open(f"src/botany/ochiai_format/{save_name}.txt", "w") as f:
-        f.write(strength)
+    with open(f"src/botany/ochiai_format/{i+2}_{save_name}.txt", "w") as f:
+        f.write(output)
 
-    print(strength)
+    print(output)
+
+
+
+# Generate contribution for ochiai format
+query_1 = "Contribution of this study"
+query_2 = "Problems with previous studies"
+
+# Get top-k relevant documents
+contribution_result = retriever.get_relevant_documents(query_1)
+problems_result = retriever.get_relevant_documents(query_2)
+
+llm_model = OpenAIChat(model_name="gpt-3.5-turbo")
+
+contribution_template = """Write a 50-word summary of the contribution of this study from the following statement:
+
+
+"{contribution_text}"
+
+
+If it contains only irrelevant content, return "Nothing".
+
+Output:"""
+problems_template = """Write a 50-word summary of the problems with the privious studies from the following statement:
+
+
+"{problem_text}"
+
+
+If it contains only irrelevant content, return "Nothing".
+
+Output:"""
+
+combine_template = """Write a 50-word summary of what makes this study superior to previous studies based on the given <CONTRIBUTION OF THIS STUDY> and <PROBLEMS OF PREVIOUS STUDIES>:
+
+
+<CONTRIBUTION OF THIS STUDY>: "{contribution}"
+<PROBLEMS OF PREVIOUS STUDIES>: "{problems}"
+
+
+Output: """
+
+
+contribution_prompt = PromptTemplate(
+    input_variables=["contribution_text"],
+    template=contribution_template,
+)
+contribution_chain = LLMChain(llm=llm_model, prompt=contribution_prompt, output_key="contribution")
+combined_contribution_chain = StuffDocumentsChain(
+    llm_chain=contribution_chain,
+    document_variable_name="contribution_text",
+    verbose=True,
+)
+contribution = combined_contribution_chain.run(contribution_result)
+
+
+problem_prompt = PromptTemplate(
+    input_variables=["problem_text"],
+    template=problems_template,
+)
+problem_chain = LLMChain(llm=llm_model, prompt=problem_prompt, output_key="problems")
+combined_problem_chain = StuffDocumentsChain(
+    llm_chain=problem_chain,
+    document_variable_name="problem_text",
+    verbose=True,
+)
+problems = combined_problem_chain.run(problems_result)
+
+
+overall_prompt = PromptTemplate(
+    input_variables=["contribution", "problems"],
+    template=combine_template,
+)
+overall_chain = LLMChain(llm=llm_model, prompt=overall_prompt, verbose=True)
+output = overall_chain.run({
+    "contribution": contribution,
+    "problems": problems,
+})
+
+# Save the result to a txt file
+with open(f"src/botany/ochiai_format/1_contribution.txt", "w") as f:
+    f.write(output)
+
+print(output)

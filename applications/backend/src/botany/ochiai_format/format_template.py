@@ -24,7 +24,7 @@ OCHI_EVAL_QUERY = "Experiments and its evaluation of this study"
 OCHI_DISCUSSION_QUERY = "Discussion on the results of this study"
 # OCHI_NEXT_QUERY = "What papers are recommended to read next?"
 
-OCHI_STRENGTH_TEMPLATE = """Write a 100-word summary of what makes this study superior to previous studies from the following statement:
+OCHI_STRENGTH_TEMPLATE = """Write up to a 100-word summary of what makes this study superior to previous studies from the following statement:
 
 
 "{text}"
@@ -38,24 +38,30 @@ The output format should be as follows:
 Make sure that the output is one sentence following the specified format above.
 
 Output: """
-OCHI_METHOD_TEMPLATE = """Write a 100-word summary of the key techniques and methods of this study from the following statement:
+OCHI_METHOD_TEMPLATE = """Write up to a 100-word summary of the proposed method of this study from the following statement:
 
 
 "{text}"
 
+
+Make sure to include ONLY the proposed method, rather than trying to generate a redundant summary when there are only a few relevant elements in the above statement.
 
 Output: """
-OCHI_EVAL_TEMPLATE = """Write a 100-word summary of the evaluation methodology of the proposed method from the following statement:
+OCHI_EVAL_TEMPLATE = """Write up to a 100-word summary of the evaluation methodology of the proposed method from the following statement:
 
 
 "{text}"
 
+
+Make sure to include ONLY the evaluation methodology, rather than trying to generate a redundant summary when there are only a few relevant elements in the above statement.
 
 Output: """
-OCHI_DISCUSSION_TEMPLATE = """Write a 100-word summary of how authors provide insight into the evaluation results from the following statements:
+OCHI_DISCUSSION_TEMPLATE = """Write up to a 100-word summary of how authors provide insight into the evaluation results from the following statements:
 
 
 "{text}"
 
+
+Make sure to include ONLY the authors insights into the evaluation results, rather than trying to generate a redundant summary when there are only a few relevant elements in the above statement.
 
 Output: """
