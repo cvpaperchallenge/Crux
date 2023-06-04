@@ -39,7 +39,10 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 # Define paths
 persist_directory = "src/botany/db"
 # pdf_path = "data/RLTutor_ Reinforcement Learning Based Adaptive Tutoring System.pdf"
-txt_path = "data/rltutor_latex.txt"
+# txt_path = "data/rltutor_latex.txt"
+# txt_path = "data/graph_representation.txt"
+txt_path = "data/visual_atoms.txt"
+paper_acronym = txt_path.split("/")[-1].split("_")[0]
 
 # Define parameters
 chunk_size = 200
@@ -97,7 +100,7 @@ for i, (save_name, query, template) in enumerate(zip(
     output = combine_document_chain.run(result)
 
     # Save the result to a txt file
-    with open(f"src/botany/ochiai_format/{i+2}_{save_name}.txt", "w") as f:
+    with open(f"src/botany/ochiai_format/{paper_acronym}_{i+2}_{save_name}.txt", "w") as f:
         f.write(output)
 
     print(output)
@@ -180,7 +183,7 @@ output = overall_chain.run({
 })
 
 # Save the result to a txt file
-with open(f"src/botany/ochiai_format/1_contribution.txt", "w") as f:
+with open(f"src/botany/ochiai_format/{paper_acronym}_1_contribution.txt", "w") as f:
     f.write(output)
 
 print(output)
