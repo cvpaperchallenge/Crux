@@ -28,6 +28,7 @@ from langchain.chains.summarize import load_summarize_chain, map_reduce_prompt
 from langchain.chains.combine_documents.map_reduce import MapReduceDocumentsChain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 
+from langchain.callbacks import get_openai_callback
 from dotenv import load_dotenv
 from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
 from src.botany.ochiai_format.format_template import OCHI_STRENGTH_QUERY, OCHI_METHOD_QUERY, OCHI_EVAL_QUERY, OCHI_DISCUSSION_QUERY, \
@@ -48,7 +49,7 @@ paper_acronym = txt_path.split("/")[-1].split("_")[0]
 # Define parameters
 chunk_size = 200
 chunk_overlap = 40
-top_k = 10
+top_k = 5
 search_type = "similarity" # "similarity", "similarity_score_threshold", "mmr"
 
 # Load a pdf document
@@ -63,7 +64,7 @@ raw_documents = loader.load()
 #     chunk_overlap = chunk_overlap
 # )
 text_splitter = LatexSplitter.from_language(
-    chunk_size=200, chunk_overlap=40
+    chunk_size=chunk_size, chunk_overlap=chunk_overlap
 )
 
 documents = text_splitter.split_documents(documents=raw_documents)
@@ -79,116 +80,145 @@ vectorstore = FAISS.from_documents(
 # Define a retriever
 retriever = vectorstore.as_retriever(serch_type=search_type, search_kwargs={"k": top_k})
 
-# Generate method, evaluation, discussion for ochiai format
-for i, (save_name, query, template) in enumerate(zip(
-    ["method", "evaluation", "discussion"],
-    [OCHI_METHOD_QUERY, OCHI_EVAL_QUERY, OCHI_DISCUSSION_QUERY],
-    [OCHI_METHOD_TEMPLATE, OCHI_EVAL_TEMPLATE, OCHI_DISCUSSION_TEMPLATE]
-    )):
-    llm_model = OpenAIChat(model_name="gpt-3.5-turbo")
-    
+with get_openai_callback() as cb:
+
+
+    ###### Generate method, evaluation, discussion for ochiai format
+    for i, (save_name, query, template) in enumerate(zip(
+        ["method", "evaluation", "discussion"],
+        [OCHI_METHOD_QUERY, OCHI_EVAL_QUERY, OCHI_DISCUSSION_QUERY],
+        [OCHI_METHOD_TEMPLATE, OCHI_EVAL_TEMPLATE, OCHI_DISCUSSION_TEMPLATE]
+        )):
+        llm_model = OpenAIChat(model_name="gpt-3.5-turbo")
+        
+        # Get top-k relevant documents
+        result = retriever.get_relevant_documents(query)
+
+        prompt = PromptTemplate(template=template, input_variables=["text"])
+
+        # The chain to make summaries by mapping over the documents chunk-wise
+        chain = LLMChain(llm=llm_model, prompt=prompt, verbose=True)
+
+        # The chain to stuff the summaries into the `combine_template`
+        combine_document_chain = StuffDocumentsChain(
+            llm_chain=chain,
+            document_variable_name="text",
+            verbose=True,
+        )
+
+        output = combine_document_chain.run(result)
+
+        # Save the result to a txt file
+        with open(f"src/botany/ochiai_format/{paper_acronym}_{i+3}_{save_name}.txt", "w") as f:
+            f.write(output)
+
+        print(output)
+
+
+
+    ###### Generate contribution for ochiai format
+    query_1 = "Contribution of this study"
+    query_2 = "Problems with previous studies"
+
     # Get top-k relevant documents
-    result = retriever.get_relevant_documents(query)
+    contribution_result = retriever.get_relevant_documents(query_1)
+    problems_result = retriever.get_relevant_documents(query_2)
 
-    prompt = PromptTemplate(template=template, input_variables=["text"])
+    llm_model = OpenAIChat(model_name="gpt-3.5-turbo")
 
-    # The chain to make summaries by mapping over the documents chunk-wise
-    chain = LLMChain(llm=llm_model, prompt=prompt, verbose=True)
+    contribution_template = """Write a 50-word summary of the contribution of this study from the following statement:
 
-    # The chain to stuff the summaries into the `combine_template`
-    combine_document_chain = StuffDocumentsChain(
-        llm_chain=chain,
-        document_variable_name="text",
+
+    "{contribution_text}"
+
+
+    If it contains only irrelevant content, return "Nothing".
+
+    Output:"""
+    problems_template = """Write a 50-word summary of the problems with the privious studies from the following statement:
+
+
+    "{problem_text}"
+
+
+    If it contains only irrelevant content, return "Nothing".
+
+    Output:"""
+
+    combine_template = """Write a 50-word summary of what makes this study superior to previous studies based on the given <CONTRIBUTION OF THIS STUDY> and <PROBLEMS OF PREVIOUS STUDIES>:
+
+
+    <CONTRIBUTION OF THIS STUDY>: "{contribution}"
+    <PROBLEMS OF PREVIOUS STUDIES>: "{problems}"
+
+
+    Output: """
+
+    contribution_prompt = PromptTemplate(
+        input_variables=["contribution_text"],
+        template=contribution_template,
+    )
+    contribution_chain = LLMChain(llm=llm_model, prompt=contribution_prompt, output_key="contribution")
+    combined_contribution_chain = StuffDocumentsChain(
+        llm_chain=contribution_chain,
+        document_variable_name="contribution_text",
         verbose=True,
     )
+    contribution = combined_contribution_chain.run(contribution_result)
 
-    output = combine_document_chain.run(result)
+
+    problem_prompt = PromptTemplate(
+        input_variables=["problem_text"],
+        template=problems_template,
+    )
+    problem_chain = LLMChain(llm=llm_model, prompt=problem_prompt, output_key="problems")
+    combined_problem_chain = StuffDocumentsChain(
+        llm_chain=problem_chain,
+        document_variable_name="problem_text",
+        verbose=True,
+    )
+    problems = combined_problem_chain.run(problems_result)
+
+
+    overall_prompt = PromptTemplate(
+        input_variables=["contribution", "problems"],
+        template=combine_template,
+    )
+    overall_chain = LLMChain(llm=llm_model, prompt=overall_prompt, verbose=True)
+    output = overall_chain.run({
+        "contribution": contribution,
+        "problems": problems,
+    })
 
     # Save the result to a txt file
-    with open(f"src/botany/ochiai_format/{paper_acronym}_{i+2}_{save_name}.txt", "w") as f:
+    with open(f"src/botany/ochiai_format/{paper_acronym}_2_contribution.txt", "w") as f:
         f.write(output)
 
     print(output)
 
 
 
-# Generate contribution for ochiai format
-query_1 = "Contribution of this study"
-query_2 = "Problems with previous studies"
+    ###### Generate the general sumamry for ochiai format
+    chat_model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+    text_splitter = TokenTextSplitter.from_tiktoken_encoder(
+        model_name="gpt-3.5-turbo", # "text-embedding-ada-002"
+        chunk_size = 1000,
+        chunk_overlap = 50
+    )
+    for docs in raw_documents:
+        docs.page_content = docs.page_content.split("\\section{References}")[0]
+        print(docs.page_content)
 
-# Get top-k relevant documents
-contribution_result = retriever.get_relevant_documents(query_1)
-problems_result = retriever.get_relevant_documents(query_2)
+    documents = text_splitter.split_documents(documents=raw_documents)
 
-llm_model = OpenAIChat(model_name="gpt-3.5-turbo")
+    # Summarize a document chunk-wise first, then summarize those summaries in a single summary
+    chain = load_summarize_chain(llm=chat_model, chain_type="map_reduce", verbose=True)
+    output = chain.run(documents)
 
-contribution_template = """Write a 50-word summary of the contribution of this study from the following statement:
+    # Save the result to a txt file
+    with open(f"src/botany/ochiai_format/{paper_acronym}_1_abstract.txt", "w") as f:
+        f.write(output)
 
+    print(output)
 
-"{contribution_text}"
-
-
-If it contains only irrelevant content, return "Nothing".
-
-Output:"""
-problems_template = """Write a 50-word summary of the problems with the privious studies from the following statement:
-
-
-"{problem_text}"
-
-
-If it contains only irrelevant content, return "Nothing".
-
-Output:"""
-
-combine_template = """Write a 50-word summary of what makes this study superior to previous studies based on the given <CONTRIBUTION OF THIS STUDY> and <PROBLEMS OF PREVIOUS STUDIES>:
-
-
-<CONTRIBUTION OF THIS STUDY>: "{contribution}"
-<PROBLEMS OF PREVIOUS STUDIES>: "{problems}"
-
-
-Output: """
-
-
-contribution_prompt = PromptTemplate(
-    input_variables=["contribution_text"],
-    template=contribution_template,
-)
-contribution_chain = LLMChain(llm=llm_model, prompt=contribution_prompt, output_key="contribution")
-combined_contribution_chain = StuffDocumentsChain(
-    llm_chain=contribution_chain,
-    document_variable_name="contribution_text",
-    verbose=True,
-)
-contribution = combined_contribution_chain.run(contribution_result)
-
-
-problem_prompt = PromptTemplate(
-    input_variables=["problem_text"],
-    template=problems_template,
-)
-problem_chain = LLMChain(llm=llm_model, prompt=problem_prompt, output_key="problems")
-combined_problem_chain = StuffDocumentsChain(
-    llm_chain=problem_chain,
-    document_variable_name="problem_text",
-    verbose=True,
-)
-problems = combined_problem_chain.run(problems_result)
-
-
-overall_prompt = PromptTemplate(
-    input_variables=["contribution", "problems"],
-    template=combine_template,
-)
-overall_chain = LLMChain(llm=llm_model, prompt=overall_prompt, verbose=True)
-output = overall_chain.run({
-    "contribution": contribution,
-    "problems": problems,
-})
-
-# Save the result to a txt file
-with open(f"src/botany/ochiai_format/{paper_acronym}_1_contribution.txt", "w") as f:
-    f.write(output)
-
-print(output)
+    print(cb)
