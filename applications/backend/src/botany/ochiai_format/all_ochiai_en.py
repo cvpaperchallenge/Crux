@@ -196,6 +196,8 @@ with get_openai_callback() as cb:
 
     print(output)
 
+    print(cb)
+
 
 
     ###### Generate the general sumamry for ochiai format
