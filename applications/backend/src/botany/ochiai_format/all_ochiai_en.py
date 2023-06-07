@@ -31,7 +31,7 @@ from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 from langchain.callbacks import get_openai_callback
 from dotenv import load_dotenv
 from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
-from src.botany.ochiai_format.format_template import OCHI_STRENGTH_QUERY, OCHI_METHOD_QUERY, OCHI_EVAL_QUERY, OCHI_DISCUSSION_QUERY, \
+from src.botany.ochiai_format.format_template_en import OCHI_STRENGTH_QUERY, OCHI_METHOD_QUERY, OCHI_EVAL_QUERY, OCHI_DISCUSSION_QUERY, \
     OCHI_STRENGTH_TEMPLATE, OCHI_METHOD_TEMPLATE, OCHI_EVAL_TEMPLATE, OCHI_DISCUSSION_TEMPLATE
 from src.botany.ochiai_format.latex_splitter import LatexSplitter
 
