@@ -26,10 +26,10 @@ from langchain.chains import LLMChain, ConversationalRetrievalChain
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain
 from langchain.chains.summarize import load_summarize_chain
 
+from langchain.callbacks import get_openai_callback
 from dotenv import load_dotenv
 from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
 from src.botany.ochiai_format.latex_splitter import LatexSplitter
-from langchain.callbacks import get_openai_callback
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
