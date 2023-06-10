@@ -126,31 +126,32 @@ with get_openai_callback() as cb:
 
     llm_model = OpenAIChat(model_name="gpt-3.5-turbo")
 
-    contribution_template = """以下の文章から、この論文の貢献についての日本語要約を最大200字で書いてください。
+    contribution_template = """以下に与える英語論文の抜粋から、この論文の主要な貢献についての日本語要約を100字程度で書いてください。
 
 
     "{contribution_text}"
 
 
-    もし関係ない内容しかない場合は、"Nothing"を返してください。
+    もし英語論文の抜粋に、この論文の主要な貢献についての要約に不必要な内容しかない場合は、"Nothing"を返してください。また、回答には「〜だ。である。」といった常体を使用してください。文章に含まれる関連要素が少ない場合は、冗長な要約を生成しようとせず、100字未満の日本語要約で回答してください。
 
     日本語要約:"""
-    problems_template = """以下の文章から、先行研究の問題点についての日本語要約を最大200字で書いてください。
+    problems_template = """以下に与える英語論文の抜粋から、先行研究の問題点についての日本語要約を100字程度で書いてください。
 
 
     "{problem_text}"
 
 
-    もし関係ない内容しかない場合は、"Nothing"を返してください。
+    もし英語論文の抜粋に、先行研究の問題点についての要約に不必要な内容しかない場合は、"Nothing"を返してください。また、回答には「〜だ。である。」といった常体を使用してください。文章に含まれる関連要素が少ない場合は、冗長な要約を生成しようとせず、100字未満の日本語要約で回答してください。
 
     日本語要約:"""
 
-    combine_template = """以下の<CONTRIBUTION OF THIS STUDY>と<PROBLEMS OF PREVIOUS STUDIES>を参考に、この論文の貢献と先行研究の問題点についての日本語要約を最大200字で書いてください。
+    combine_template = """以下の<CONTRIBUTION OF THIS STUDY>と<PROBLEMS OF PREVIOUS STUDIES>を参考に、この論文の主要な貢献と先行研究の問題点についての日本語要約を最大200字で書いてください。
 
 
     <CONTRIBUTION OF THIS STUDY>: "{contribution}"
     <PROBLEMS OF PREVIOUS STUDIES>: "{problems}"
 
+    回答には、既存の問題とそれを解決する新たな理論・研究方法・経験的実験による評価を含めてください。また回答には「〜だ。である。」といった常体を使用してください。文章に含まれる関連要素が少ない場合は、冗長な要約を生成しようとせず、100字未満の日本語要約で回答してください。
 
     日本語要約:"""
 
@@ -213,11 +214,12 @@ with get_openai_callback() as cb:
 
     documents = text_splitter.split_documents(documents=raw_documents)
 
-    prompt_template = """以下の文章を最大100字で日本語要約してください。
+    prompt_template = """以下に与える英語論文の抜粋から、論文の主題、目的、およびタスクについて100字程度で日本語要約してください。
 
 
     "{text}"
 
+    回答には「〜だ。である。」といった常体を使用してください。文章に含まれる関連要素が少ない場合は、冗長な要約を生成しようとせず、100字未満の日本語要約で回答してください。
 
     日本語要約:"""
     ja_prompt = PromptTemplate(template=prompt_template, input_variables=["text"])
