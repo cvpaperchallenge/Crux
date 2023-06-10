@@ -21,7 +21,7 @@ class FormatCVPaper(BaseModel):
 OCHI_STRENGTH_QUERY = "Main contribution of this study"
 OCHI_METHOD_QUERY = "Proposed method of this study"
 OCHI_EVAL_QUERY = "Experiments and its evaluation of this study"
-OCHI_DISCUSSION_QUERY = "Discussion on the results of this study"
+OCHI_DISCUSSION_QUERY = "Authors insights on this study"
 # OCHI_NEXT_QUERY = "What papers are recommended to read next?"
 
 OCHI_STRENGTH_TEMPLATE = """Write up to a 100-word summary of what makes this study superior to previous studies from the following statement:
