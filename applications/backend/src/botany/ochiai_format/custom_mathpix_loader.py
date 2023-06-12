@@ -1,16 +1,19 @@
 from __future__ import annotations
 
-from typing import Any
 import json
 import os
+from typing import Any
+
 from dotenv import load_dotenv
 from langchain.docstore.document import Document
 from langchain.document_loaders import MathpixPDFLoader
 
 load_dotenv()
 
+
 class CustomMathpixLoader(MathpixPDFLoader):
-    def __init__(self,
+    def __init__(
+        self,
         file_path: str,
         processed_file_format: str = "mmd",
         max_wait_time_seconds: int = 500,
@@ -21,11 +24,20 @@ class CustomMathpixLoader(MathpixPDFLoader):
     ) -> None:
         self.output_langchain_document = output_langchain_document
         self.other_request_parameters = other_request_parameters
-        super().__init__(file_path, processed_file_format, max_wait_time_seconds, should_clean_pdf, **kwargs)
-    
+        super().__init__(
+            file_path,
+            processed_file_format,
+            max_wait_time_seconds,
+            should_clean_pdf,
+            **kwargs,
+        )
+
     @property
     def data(self) -> dict:
-        options = {"conversion_formats": {self.processed_file_format: True}, **self.other_request_parameters}
+        options = {
+            "conversion_formats": {self.processed_file_format: True},
+            **self.other_request_parameters,
+        }
         return {"options_json": json.dumps(options)}
 
     def load(self) -> list[Document] | str:
@@ -39,7 +51,7 @@ class CustomMathpixLoader(MathpixPDFLoader):
         else:
             output = contents
         return output
-    
+
 
 if __name__ == "__main__":
     # Get only text files under /data folder iteratively
@@ -55,7 +67,10 @@ if __name__ == "__main__":
                 print(txt_path)
                 loader = CustomMathpixLoader(
                     file_path=txt_path,
-                    other_request_parameters={"math_inline_delimiters": ["$", "$"], "math_display_delimiters": ["$$", "$$"]},
+                    other_request_parameters={
+                        "math_inline_delimiters": ["$", "$"],
+                        "math_display_delimiters": ["$$", "$$"],
+                    },
                     output_langchain_document=False,
                 )
                 # loader = TextLoader(file_path=txt_path)

@@ -2,9 +2,12 @@
 
 from pydantic import BaseModel, Field
 
+
 class FormatOchiai(BaseModel):
     abstract: str = Field(discriprion="Single-sentence summary of what this study did")
-    strength_over_previous_study: str = Field(discriprion="What makes it better than previous studies?")
+    strength_over_previous_study: str = Field(
+        discriprion="What makes it better than previous studies?"
+    )
     method: str = Field(discriprion="The key to techniques and methods")
     evaluation: str = Field(discriprion="Evaluation methodology of the proposed method")
     discussion: str = Field(discriprion="Discussion on the results of the evaluation")

@@ -1,37 +1,47 @@
 import os
-import openai
 
-# langchain Models
-from langchain.llms import OpenAIChat
+import openai
+from dotenv import load_dotenv
+
+# langchain Chains
+from langchain.chains import (
+    ConversationalRetrievalChain,
+    LLMChain,
+    SequentialChain,
+    SimpleSequentialChain,
+)
+from langchain.chains.combine_documents.map_reduce import MapReduceDocumentsChain
+from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.chains.qa_with_sources import load_qa_with_sources_chain
+from langchain.chains.summarize import load_summarize_chain, map_reduce_prompt
 from langchain.chat_models import ChatOpenAI
 
-# langchain Prompts
-from langchain.prompts import PromptTemplate
-from langchain.output_parsers import PydanticOutputParser, OutputFixingParser
-
-# langchain Memory
-from langchain.memory import ConversationBufferMemory
-from langchain.memory import VectorStoreRetrieverMemory
-
-
 # langchain Indexes
-from langchain.document_loaders import PyMuPDFLoader, MathpixPDFLoader, TextLoader
-from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter, RecursiveCharacterTextSplitter, Language
-from langchain.vectorstores import Chroma, FAISS
+from langchain.document_loaders import MathpixPDFLoader, PyMuPDFLoader, TextLoader
+
 # from langchain.indexes import VectorstoreIndexCreator
 from langchain.embeddings.openai import OpenAIEmbeddings
 
-# langchain Chains
-from langchain.chains import LLMChain, ConversationalRetrievalChain, SimpleSequentialChain, SequentialChain
-from langchain.chains.qa_with_sources import load_qa_with_sources_chain
-from langchain.chains.summarize import load_summarize_chain, map_reduce_prompt
-from langchain.chains.combine_documents.map_reduce import MapReduceDocumentsChain
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+# langchain Models
+from langchain.llms import OpenAIChat
 
-from dotenv import load_dotenv
-from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
-from src.botany.ochiai_format.latex_splitter import LatexSplitter
+# langchain Memory
+from langchain.memory import ConversationBufferMemory, VectorStoreRetrieverMemory
+from langchain.output_parsers import OutputFixingParser, PydanticOutputParser
+
+# langchain Prompts
+from langchain.prompts import PromptTemplate
+from langchain.text_splitter import (
+    CharacterTextSplitter,
+    Language,
+    RecursiveCharacterTextSplitter,
+    TokenTextSplitter,
+)
+from langchain.vectorstores import FAISS, Chroma
+
 from src.botany.ochiai_format.custom_mathpix_loader import CustomMathpixLoader
+from src.botany.ochiai_format.latex_splitter import LatexSplitter
+from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -47,7 +57,7 @@ txt_path = "data/RLTutor_ Reinforcement Learning Based Adaptive Tutoring System.
 chunk_size = 200
 chunk_overlap = 20
 top_k = 5
-search_type = "similarity" # "similarity", "similarity_score_threshold", "mmr"
+search_type = "similarity"  # "similarity", "similarity_score_threshold", "mmr"
 
 # Load a pdf document
 # loader = PyMuPDFLoader(file_path=pdf_path)
@@ -70,9 +80,7 @@ raw_documents = loader.load()
 # text_splitter = RecursiveCharacterTextSplitter.from_language(
 #     language=Language.LATEX, chunk_size=chunk_size, chunk_overlap=chunk_overlap
 # )
-text_splitter = LatexSplitter.from_language(
-    chunk_size=200, chunk_overlap=40
-)
+text_splitter = LatexSplitter.from_language(chunk_size=200, chunk_overlap=40)
 
 documents = text_splitter.split_documents(documents=raw_documents)
 
@@ -131,7 +139,9 @@ contribution_prompt = PromptTemplate(
     input_variables=["contribution_text"],
     template=contribution_template,
 )
-contribution_chain = LLMChain(llm=llm_model, prompt=contribution_prompt, output_key="contribution")
+contribution_chain = LLMChain(
+    llm=llm_model, prompt=contribution_prompt, output_key="contribution"
+)
 combined_contribution_chain = StuffDocumentsChain(
     llm_chain=contribution_chain,
     document_variable_name="contribution_text",
@@ -158,10 +168,12 @@ overall_prompt = PromptTemplate(
     template=combine_template,
 )
 overall_chain = LLMChain(llm=llm_model, prompt=overall_prompt, verbose=True)
-output = overall_chain.run({
-    "contribution": contribution,
-    "problems": problems,
-})
+output = overall_chain.run(
+    {
+        "contribution": contribution,
+        "problems": problems,
+    }
+)
 
 
 print(output)

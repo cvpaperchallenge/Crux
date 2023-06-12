@@ -1,35 +1,35 @@
 import os
+
 import openai
+from dotenv import load_dotenv
+from langchain.callbacks import get_openai_callback
 
-# langchain Models
-from langchain.llms import OpenAI
+# langchain Chains
+from langchain.chains import ConversationalRetrievalChain, LLMChain
+from langchain.chains.qa_with_sources import load_qa_with_sources_chain
+from langchain.chains.summarize import load_summarize_chain
 from langchain.chat_models import ChatOpenAI
-
-# langchain Prompts
-from langchain.prompts import PromptTemplate
-from langchain.output_parsers import PydanticOutputParser, OutputFixingParser
-
-# langchain Memory
-from langchain.memory import ConversationBufferMemory
-from langchain.memory import VectorStoreRetrieverMemory
-
 
 # langchain Indexes
 from langchain.document_loaders import PyMuPDFLoader, TextLoader
-from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
-from langchain.vectorstores import Chroma, FAISS
+
 # from langchain.indexes import VectorstoreIndexCreator
 from langchain.embeddings.openai import OpenAIEmbeddings
 
-# langchain Chains
-from langchain.chains import LLMChain, ConversationalRetrievalChain
-from langchain.chains.qa_with_sources import load_qa_with_sources_chain
-from langchain.chains.summarize import load_summarize_chain
+# langchain Models
+from langchain.llms import OpenAI
 
-from langchain.callbacks import get_openai_callback
-from dotenv import load_dotenv
-from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
+# langchain Memory
+from langchain.memory import ConversationBufferMemory, VectorStoreRetrieverMemory
+from langchain.output_parsers import OutputFixingParser, PydanticOutputParser
+
+# langchain Prompts
+from langchain.prompts import PromptTemplate
+from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
+from langchain.vectorstores import FAISS, Chroma
+
 from src.botany.ochiai_format.latex_splitter import LatexSplitter
+from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -44,7 +44,7 @@ chat_model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
 chunk_size = 1000
 chunk_overlap = 50
 top_k = 5
-search_type = "mmr" # "similarity", "similarity_score_threshold", "mmr"
+search_type = "mmr"  # "similarity", "similarity_score_threshold", "mmr"
 query = "What makes this research better than the previous research?"
 
 # Load a pdf document
@@ -58,9 +58,9 @@ for docs in raw_documents:
 
 # Split documents into chunks with some overlap
 text_splitter = TokenTextSplitter.from_tiktoken_encoder(
-    model_name="gpt-3.5-turbo", # "text-embedding-ada-002"
-    chunk_size = chunk_size,
-    chunk_overlap = chunk_overlap
+    model_name="gpt-3.5-turbo",  # "text-embedding-ada-002"
+    chunk_size=chunk_size,
+    chunk_overlap=chunk_overlap,
 )
 # text_splitter = LatexSplitter.from_language(
 #     chunk_size=200, chunk_overlap=40

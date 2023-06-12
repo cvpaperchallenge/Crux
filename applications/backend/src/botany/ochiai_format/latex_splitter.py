@@ -1,16 +1,7 @@
-
-from typing import Any, List, Optional
-from langchain.text_splitter import TextSplitter
 import re
-from typing import (
-    AbstractSet,
-    Any,
-    Collection,
-    List,
-    Literal,
-    Optional,
-    Union,
-)
+from typing import AbstractSet, Any, Collection, List, Literal, Optional, Union
+
+from langchain.text_splitter import TextSplitter
 
 
 def _split_text(text: str, separator: str, keep_separator: bool) -> List[str]:
@@ -34,6 +25,7 @@ class LatexSplitter(TextSplitter):
     """
     Split the input text in the same way as RecursiveCharacterTextSplitter, but not based on the text length but on the token length.
     """
+
     def __init__(
         self,
         encoding_name: str = "gpt2",
@@ -124,8 +116,8 @@ class LatexSplitter(TextSplitter):
             merged_text = self._merge_splits(_good_splits, _separator)
             final_chunks.extend(merged_text)
         return final_chunks
-    
-    def _split_token(self, chunks: str) -> List[str]:
+
+    def _split_token(self, chunks: list(str)) -> List[str]:
         """Split each incoming latex chunk into multiple chunks based on the token length."""
         splits = []
         for text in chunks:
@@ -144,14 +136,11 @@ class LatexSplitter(TextSplitter):
                 chunk_ids = input_ids[start_idx:cur_idx]
         return splits
 
-
     def split_text(self, text: str) -> List[str]:
         latex_chunks = self._split_latex(text, self.separators)
         final_chunks = self._split_token(latex_chunks)
         return final_chunks
 
     @classmethod
-    def from_language(
-        cls, **kwargs: Any
-    ):
+    def from_language(cls, **kwargs: Any):
         return cls(**kwargs)

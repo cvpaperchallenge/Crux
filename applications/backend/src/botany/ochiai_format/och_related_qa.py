@@ -1,36 +1,39 @@
 import os
+
 import openai
+from dotenv import load_dotenv
 
-# langchain Models
-from langchain.llms import OpenAIChat
+# langchain Chains
+from langchain.chains import (
+    ConversationalRetrievalChain,
+    LLMChain,
+    SimpleSequentialChain,
+)
+from langchain.chains.combine_documents.map_reduce import MapReduceDocumentsChain
+from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.chains.qa_with_sources import load_qa_with_sources_chain
+from langchain.chains.summarize import load_summarize_chain, map_reduce_prompt
 from langchain.chat_models import ChatOpenAI
-
-# langchain Prompts
-from langchain.prompts import PromptTemplate
-from langchain.output_parsers import PydanticOutputParser, OutputFixingParser
-
-# langchain Memory
-from langchain.memory import ConversationBufferMemory
-from langchain.memory import VectorStoreRetrieverMemory
-
 
 # langchain Indexes
 from langchain.document_loaders import PyMuPDFLoader
-from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
-from langchain.vectorstores import Chroma, FAISS
+
 # from langchain.indexes import VectorstoreIndexCreator
 from langchain.embeddings.openai import OpenAIEmbeddings
 
-# langchain Chains
-from langchain.chains import LLMChain, ConversationalRetrievalChain, SimpleSequentialChain
-from langchain.chains.qa_with_sources import load_qa_with_sources_chain
-from langchain.chains.summarize import load_summarize_chain, map_reduce_prompt
-from langchain.chains.combine_documents.map_reduce import MapReduceDocumentsChain
-from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+# langchain Models
+from langchain.llms import OpenAIChat
 
-from dotenv import load_dotenv
+# langchain Memory
+from langchain.memory import ConversationBufferMemory, VectorStoreRetrieverMemory
+from langchain.output_parsers import OutputFixingParser, PydanticOutputParser
+
+# langchain Prompts
+from langchain.prompts import PromptTemplate
+from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
+from langchain.vectorstores import FAISS, Chroma
+
 from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
-
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -45,7 +48,7 @@ llm_model = OpenAIChat(model_name="gpt-3.5-turbo")
 chunk_size = 200
 chunk_overlap = 40
 top_k = 10
-search_type = "similarity" # "similarity", "similarity_score_threshold", "mmr"
+search_type = "similarity"  # "similarity", "similarity_score_threshold", "mmr"
 # query = "What makes this research better than the previous research?"
 query = "Main contribution of this research"
 
@@ -60,9 +63,9 @@ raw_documents = loader.load()
 #     chunk_overlap = chunk_overlap
 # )
 text_splitter = TokenTextSplitter.from_tiktoken_encoder(
-    model_name="gpt-3.5-turbo", # "text-embedding-ada-002"
-    chunk_size = chunk_size,
-    chunk_overlap = chunk_overlap
+    model_name="gpt-3.5-turbo",  # "text-embedding-ada-002"
+    chunk_size=chunk_size,
+    chunk_overlap=chunk_overlap,
 )
 documents = text_splitter.split_documents(documents=raw_documents)
 

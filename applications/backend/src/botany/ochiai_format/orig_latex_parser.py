@@ -1,5 +1,6 @@
 import re
 
+
 def parse_latex_text(latex_document):
     # titleを取得
     text_1 = latex_document.split("\\title{")[-1]
@@ -27,14 +28,14 @@ def parse_latex_text(latex_document):
         section_dict = {
             "section_id": section_id,
             "section_title": section_title,
-            "section_text": section_text
+            "section_text": section_text,
         }
         section_list.append(section_dict)
         section_id += 1
 
     # subsectionを取得
     for each_section_dict in section_list:
-        raw_subsection_list =  each_section_dict["section_text"].split("\\subsection{")
+        raw_subsection_list = each_section_dict["section_text"].split("\\subsection{")
         # subsectionを持たないsectionをはじく
         if len(raw_subsection_list) == 1:
             each_section_dict["subsection_list"] = []
@@ -52,20 +53,20 @@ def parse_latex_text(latex_document):
                 each_section_dict["section_text"] = each_subsection
                 subsection_id += 1
                 continue
-        
+
             subsection_title, raw_subsection_text = each_subsection.split("}\n", 1)
             subsection_text = raw_subsection_text.lstrip("\n")
             subsection_text = simple_figure_table_remover(subsection_text)
             subsection_dict = {
                 "subsection_id": subsection_id,
                 "subsection_title": subsection_title,
-                "subsection_text": subsection_text
+                "subsection_text": subsection_text,
             }
             subsection_list.append(subsection_dict)
             subsection_id += 1
-            
+
         each_section_dict["subsection_list"] = subsection_list
-    
+
     parsed_document = {
         "title": title,
         "author": author,
@@ -76,8 +77,9 @@ def parse_latex_text(latex_document):
     return parsed_document
 
 
-
 def simple_figure_table_remover(text):
-    wo_table_text = re.sub(r'\\begin{tabular}(.*?)\\end{tabular}', "", text, flags=re.DOTALL)
-    wo_fig_table_text = re.sub(r'!\[\]\((.*?)\)\n', "", wo_table_text, flags=re.DOTALL)
+    wo_table_text = re.sub(
+        r"\\begin{tabular}(.*?)\\end{tabular}", "", text, flags=re.DOTALL
+    )
+    wo_fig_table_text = re.sub(r"!\[\]\((.*?)\)\n", "", wo_table_text, flags=re.DOTALL)
     return wo_fig_table_text

@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel, SecretStr, Field
+from pydantic import BaseModel, Field, SecretStr
 
 
 class Health(BaseModel):
@@ -12,14 +12,22 @@ class FormatNormal(BaseModel):
 
 
 class FormatThreePoint(BaseModel):
-    first_point: str = Field(description="First point of the three-point summary of the paper.")
-    second_point: str = Field(description="Second point of the three-point summary of the paper.")
-    third_point: str = Field(description="Third point of the three-point summary of the paper.")
+    first_point: str = Field(
+        description="First point of the three-point summary of the paper."
+    )
+    second_point: str = Field(
+        description="Second point of the three-point summary of the paper."
+    )
+    third_point: str = Field(
+        description="Third point of the three-point summary of the paper."
+    )
 
 
 class FormatOchiai(BaseModel):
     abstract: str = Field(description="Single-sentence summary of what this study did")
-    strength_over_previous_study: str = Field(description="What makes it better than previous studies?")
+    strength_over_previous_study: str = Field(
+        description="What makes it better than previous studies?"
+    )
     method: str = Field(description="The key to techniques and methods")
     evaluation: str = Field(description="Evaluation methodology of the proposed method")
     discussion: str = Field(description="Discussion on the results of the evaluation")
