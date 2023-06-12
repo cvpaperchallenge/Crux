@@ -16,7 +16,6 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 
 # langchain Chains
 from langchain.chains import LLMChain
-from langchain.chains.summarize import load_summarize_chain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
 
 # Others
@@ -220,7 +219,6 @@ with get_openai_callback() as cb:
 
 
     ###### Generate the general sumamry for ochiai format
-    chat_model = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=temperature)
     text_splitter = TokenTextSplitter.from_tiktoken_encoder(
         model_name="gpt-3.5-turbo", # "text-embedding-ada-002"
         chunk_size = 200,
