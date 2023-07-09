@@ -1,3 +1,4 @@
+# flake8: noqa
 from pydantic import SecretStr
 
 from src.core_logic import BaseSummarizeHandler

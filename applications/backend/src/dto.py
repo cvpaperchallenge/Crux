@@ -50,4 +50,4 @@ class UserOut(BaseModel):
     title: str
     author: str
     key_figure: str
-    summary_text: str
+    summary_text: FormatNormal | FormatThreePoint | FormatOchiai | FormatCVPaper
