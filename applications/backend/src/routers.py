@@ -5,8 +5,8 @@ from fastapi import Depends, File, Form, UploadFile
 from fastapi.responses import ORJSONResponse
 from pydantic import Json
 
-from src.controller import SummaryController
-from src.dto import Health, UserIn, UserOut
+from src.adapter.controller import SummaryController
+from src.domain.dto import Health, UserIn, UserOut
 
 router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
 

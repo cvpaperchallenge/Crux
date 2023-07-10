@@ -2,7 +2,7 @@
 from pydantic import SecretStr
 
 from src.core_logic import BaseSummarizeHandler
-from src.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
+from src.domain.dto import FormatCVPaper, FormatNormal, FormatOchiai, FormatThreePoint
 
 
 class SummarizeHandler:

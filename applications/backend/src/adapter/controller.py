@@ -2,8 +2,8 @@ from typing import Any
 
 from fastapi import UploadFile
 
-from src.dto import UserIn
-from src.summarize_paper import SummarizeHandler
+from src.domain.dto import UserIn
+from src.usecase.summarize_paper import SummarizeHandler
 
 
 class SummaryController:
