@@ -1,12 +1,14 @@
-from typing import Any, Final
+from typing import Any, Final, Annotated
 
 import fastapi
+import pathlib
 from fastapi import Depends, File, Form, UploadFile
 from fastapi.responses import ORJSONResponse
-from pydantic import Json
+from pydantic import Json, SecretStr
 
-from src.adapter.controller import SummaryController
+from src.adapter.summary_controller import SummaryController
 from src.domain.dto import Health, UserIn, UserOut
+from src.adapter.rdb_repository_gateway import RDBRepositoryGateway
 
 router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
 
@@ -24,31 +26,14 @@ async def health() -> dict[str, str]:
     return {"health": "ok"}
 
 
-@router.post("/summarize_1", response_model=UserOut)
-async def summarize_1(
-    pdf_file: UploadFile, user_in: UserIn = Depends()
-) -> dict[str, Any]:
-    """Endpoint for summarizing paper PDFs.
-
-    Returns:
-
-    - JSONResponse: A response from endpoint.
-
-
-    """
-    return SummaryController().summarize(pdf_file, user_in)
-
-
-@router.post("/summarize_2", response_model=UserOut)
-async def summarize_2(
-    pdf_file: UploadFile = File(...), user_in: Json[UserIn] = Form(...)
-) -> dict[str, Any]:
-    """Endpoint for summarizing paper PDFs.
-
-    Returns:
-
-    - JSONResponse: A response from endpoint.
-
-
-    """
-    return SummaryController().summarize(pdf_file, user_in)
+@router.post("/papers/summarize")
+async def summarize(
+        pdf_files: Annotated[list[UploadFile], File(description="Multiple files as UploadFile")],
+        openai_key: Annotated[SecretStr, Form(description="Specify the OpenAI API key for sumamrization")],
+        mathpix_key: Annotated[SecretStr, Form(description="Specify the Mathpix API key for OCR")],
+    ):
+    return SummaryController(
+        paper_repository=RDBRepositoryGateway,
+        summary_repository=RDBRepositoryGateway,
+        static_files_storage_root=pathlib.Path("./data/papers/"),
+    ).summarize(pdf_files, openai_key, mathpix_key)
