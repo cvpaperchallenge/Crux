@@ -29,11 +29,14 @@ async def health() -> dict[str, str]:
 @router.post("/papers/summarize")
 async def summarize(
         pdf_files: Annotated[list[UploadFile], File(description="Multiple files as UploadFile")],
-        openai_key: Annotated[SecretStr, Form(description="Specify the OpenAI API key for sumamrization")],
-        mathpix_key: Annotated[SecretStr, Form(description="Specify the Mathpix API key for OCR")],
+        openai_api_key: Annotated[SecretStr, Form(description="Specify the OpenAI API key for sumamrization")],
+        mathpix_api_key: Annotated[SecretStr, Form(description="Specify the Mathpix API key for OCR")],
+        mathpix_api_id: Annotated[SecretStr, Form(description="Specify the Mathpix API ID for OCR")],
     ):
     return SummaryController(
         paper_repository=RDBRepositoryGateway,
         summary_repository=RDBRepositoryGateway,
         static_files_storage_root=pathlib.Path("./data/papers/"),
-    ).summarize(pdf_files, openai_key, mathpix_key)
+        mathpix_api_key=mathpix_api_key,
+        mathpix_api_id=mathpix_api_id
+    ).summarize(pdf_files, openai_api_key)
