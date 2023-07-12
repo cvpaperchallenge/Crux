@@ -106,7 +106,7 @@ class SummaryHandler():
         # If full abstract is provided, use it instead of parsed one.
         documents = [
             Document(
-                page_content=abstract_text if abstract_text else parsed_paper["abstract"],
+                page_content=abstract_text if abstract_text else parsed_paper.abstract,
                 metadata={"section": "abstract"},
             )
         ]

@@ -37,6 +37,7 @@ langchain = "^0.0.229"
 openai = "^0.27.7"
 tiktoken = "^0.4.0"
 faiss-cpu = "^1.7.4"
+jinja2 = "^3.1.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.3.0"

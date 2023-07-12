@@ -6,15 +6,12 @@ from typing import Final, cast
 from pydantic import SecretStr
 
 from src.usecase.pdf_loader import CustomMathpixLoader
+from src.domain.parsed_paper_dto import ParsedPaperDTO
 
 logger: Final = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 class MathpixPdfParser:
-    def __init__(self, mathpix_api_key: SecretStr, mathpix_api_id: SecretStr) -> None:
-        self.mathpix_api_key = mathpix_api_key
-        self.mathpix_api_id = mathpix_api_id
-
     def load_pdf(self, pdf_file_path: pathlib.Path) -> str:
         """Parse pdf file to latex form and save it to storage.
 
@@ -28,6 +25,8 @@ class MathpixPdfParser:
         # If mathpix file already exists, continue loop.
         if mathpix_file_path.exists():
             logger.info(f"`{str(mathpix_file_path)}` already exists.")
+            with mathpix_file_path.open() as f:
+                latex_text = f.read()
 
         # If else, Send request to Mathpix.
         else:
@@ -41,20 +40,19 @@ class MathpixPdfParser:
                     "math_display_delimiters": ["$$", "$$"],
                 },
                 output_langchain_document=False,
-                mathpix_api_key=self.mathpix_api_key.get_secret_value(),
-                mathpix_api_id=self.mathpix_api_id.get_secret_value(),
             ).load()["mmd"]
+            latex_text = cast(str, latex_text)
 
             # Save latex format text.
             with mathpix_file_path.open("w") as f:
-                f.write(cast(str, latex_text))
+                f.write(latex_text)
         
-        return cast(str, latex_text)
+        return latex_text
 
-    def parse_pdf(self, text: str):
-        if "\\begin{abstract}" in text:
+    def parse_pdf(self, pdf_text: str) -> ParsedPaperDTO:
+        if "\\begin{abstract}" in pdf_text:
             # Remove metadata contents before abstract
-            _, contents = text.split("\\begin{abstract}")
+            _, contents = pdf_text.split("\\begin{abstract}")
 
             # Extract abstract
             abstract, contents_wo_abstract = contents.split("\n\\end{abstract}")
@@ -62,7 +60,7 @@ class MathpixPdfParser:
             pattern = re.compile(r'abstract', re.IGNORECASE)
 
             # Remove metadata contents before abstract
-            _, contents = re.split(pattern, text)
+            _, contents = re.split(pattern, pdf_text)
 
             # Extract abstract
             abstract, contents_wo_abstract = contents[1:].split("\\section{", 1)
@@ -125,7 +123,7 @@ class MathpixPdfParser:
             "section": section_list,
         }
 
-        return parsed_pdf
+        return ParsedPaperDTO.model_validate(parsed_pdf)
 
 
     def simple_figure_table_remover(self, text: str) -> str:
