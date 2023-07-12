@@ -9,7 +9,7 @@ from pydantic import Json, SecretStr
 
 from src.adapter.summary_controller import SummaryController
 from src.domain.endpoint_dto import Health, SummaryConfigDTO
-from src.adapter.rdb_repository_gateway import RDBRepositoryGateway
+from src.db.dummy_sql import DummySQL
 
 router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
 
@@ -50,7 +50,7 @@ async def summarize(
         chunk_overlap=chunk_overlap,
     )
     return SummaryController(
-        paper_repository=RDBRepositoryGateway,
-        summary_repository=RDBRepositoryGateway,
+        paper_repository=DummySQL(talbe_name="paper", pk=["paper_id"], fk={}),
+        summary_repository=DummySQL(talbe_name="summary", pk=["summary_id"], fk={"paper_id": {"table": "paper", "key": "paper_id"}}),
         static_files_storage_root=pathlib.Path("./data/papers/"),
     ).summarize(pdf_files, summary_config)
