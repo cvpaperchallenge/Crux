@@ -60,7 +60,7 @@ class MathpixPdfParser:
             pattern = re.compile(r'abstract', re.IGNORECASE)
 
             # Remove metadata contents before abstract
-            _, contents = re.split(pattern, pdf_text)
+            _, contents = re.split(pattern, pdf_text, 1)
 
             # Extract abstract
             abstract, contents_wo_abstract = contents[1:].split("\\section{", 1)
