@@ -43,7 +43,7 @@ class CustomMathpixLoader(MathpixPDFLoader):
 
     @property
     def data(self) -> dict:
-        conversion_formats = {f: True for f in self.processed_file_format}
+        conversion_formats = {f: True for f in self.processed_file_format if f != "mmd"}
         options = {
             "conversion_formats": conversion_formats,
             **self.other_request_parameters,
