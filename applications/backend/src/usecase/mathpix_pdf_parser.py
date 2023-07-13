@@ -123,7 +123,7 @@ class MathpixPdfParser:
             "section": section_list,
         }
 
-        return ParsedPaperDTO.model_validate(parsed_pdf)
+        return ParsedPaperDTO.parse_obj(parsed_pdf)
 
 
     def simple_figure_table_remover(self, text: str) -> str:

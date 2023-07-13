@@ -93,7 +93,7 @@ class SummaryHandler():
 
             # Save summary.
             with summary_file_path.open("w", encoding="utf-8") as f:
-                json.dump(summary.model_dump(), f, indent=4, ensure_ascii=False)
+                json.dump(summary.dict(), f, indent=4, ensure_ascii=False)
 
         return summary
             
