@@ -1,6 +1,4 @@
-data/*
-models/*
-outputs/*
+data
 __pycache__
 .coverage
 .mypy_cache
@@ -9,3 +7,5 @@ __pycache__
 !data/README.md
 !models/README.md
 !outputs/README.md
+
+.env

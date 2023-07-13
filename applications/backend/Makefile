@@ -1,7 +1,6 @@
 APPLICATION_PORT := 8000
-GUNICORN_TIMEOUT := 60
+GUNICORN_TIMEOUT := 6000
 LOGLEVEL := info
-
 
 .PHONY: run-backend
 run-backend:
