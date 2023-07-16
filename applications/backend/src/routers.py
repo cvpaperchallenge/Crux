@@ -21,7 +21,7 @@ async def health() -> dict[str, str]:
 
     Returns:
 
-    - JSONResponse: A response from endpoint.
+    - ORJSONResponse: A response from endpoint.
 
 
     """
@@ -59,6 +59,26 @@ async def summarize(
         int, Form(description="Specify the chunk overlap for summarization")
     ] = 40,
 ) -> list[SummaryFormat]:
+    """Endpoint for summarization.
+
+    Args:
+
+    - pdf_files (list[UploadFile]): Multiple files as UploadFile
+    - openai_api_key (SecretStr): Specify the OpenAI API key for sumamrization
+    - mathpix_api_key (SecretStr): Specify the Mathpix API key for OCR
+    - mathpix_api_id (SecretStr): Specify the Mathpix API ID for OCR
+    - summary_type (Literal["ochiai", "cvpaper"], optional): Choose the summary type. Defaults to "ochiai".
+    - llm_model_name (Literal["gpt-4", "gpt-3.5-turbo"], optional): Choose the model type used for summarization. Defaults to "gpt-3.5-turbo".
+    - temperature (float, optional): Specify the temperature for sampling. Defaults to 0.9.
+    - chunk_size (int, optional): Specify the chunk size for summarization. Defaults to 200.
+    - chunk_overlap (int, optional): Specify the chunk overlap for summarization. Defaults to 40.
+
+    Returns:
+
+    - ORJSONResponse: A list of summary format in a JSON format.
+
+
+    """
     os.environ["OPENAI_API_KEY"] = openai_api_key.get_secret_value()
     os.environ["MATHPIX_API_KEY"] = mathpix_api_key.get_secret_value()
     os.environ["MATHPIX_API_ID"] = mathpix_api_id.get_secret_value()

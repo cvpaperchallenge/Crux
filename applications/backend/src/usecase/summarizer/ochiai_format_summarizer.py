@@ -17,6 +17,15 @@ logging.basicConfig(level=logging.INFO)
 
 
 class OchiaiFormatSummarizer(BaseSummarizer):
+    """Summarizer for Ochiai format.
+
+    Args:
+        llm_model (BaseLanguageModel): language model to use
+        vectorstore (dict[str, VectorStore]): vectorstore to use
+        prompt_template_dir_path (pathlib.Path): path to prompt template directory
+
+    """
+
     def __init__(
         self,
         llm_model: BaseLanguageModel,
@@ -30,7 +39,15 @@ class OchiaiFormatSummarizer(BaseSummarizer):
         )
 
     def summarize(self, verbose: bool = True) -> FormatOchiaiDTO:
-        """"""
+        """Summarize paper in Ochiai format.
+
+        Args:
+            verbose (bool, optional): whether to print logs. Defaults to True.
+
+        Returns:
+            FormatOchiaiDTO: summarized paper in Ochiai format
+
+        """
         outline = self._summarize_outline(verbose=verbose)
         contribution = self._summarize_contribution(verbose=verbose)
         method = self._summarize_method(verbose=verbose)
@@ -155,7 +172,19 @@ class OchiaiFormatSummarizer(BaseSummarizer):
         search_kwargs: Dict = {"k": 5},
         verbose: bool = True,
     ) -> str:
-        """ """
+        """Run combine document chain.
+
+        Args:
+            query (str): query for vectorstore
+            prompt_template_filename (str): template filename for prompt
+            prompt_input_variable (str): input variable name for prompt
+            search_type (str, optional): search type for vectorstore. Defaults to "similarity".
+            search_kwargs (Dict, optional): search kwargs for vectorstore. Defaults to {"k": 5}.
+            verbose (bool, optional): verbose. Defaults to True.
+
+        Returns:
+            str: summarized text
+        """
         prompt_template: Final = self.template_env.get_template(
             prompt_template_filename
         ).render()
@@ -178,6 +207,11 @@ class OchiaiFormatSummarizer(BaseSummarizer):
         return combine_document_chain.run(result)
 
     def _get_abstract_from_vectorstore(self) -> Document:
+        """Get abstract from vectorstore.
+
+        Returns:
+            Document: abstract document
+        """
         if self.vectorstore["all"].__class__.__name__ == "FAISS":
             abstract_docstore_id = self.vectorstore["all"].index_to_docstore_id[0]  # type: ignore
             abstract_document = self.vectorstore["all"].docstore.search(abstract_docstore_id)  # type: ignore

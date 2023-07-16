@@ -18,6 +18,8 @@ logging.basicConfig(level=logging.INFO)
 
 
 class SummaryHandler:
+    """Handler for summarization."""
+
     def __init__(self, summarizer: type[BaseSummarizer]) -> None:
         self.summarizer = summarizer
 
@@ -32,9 +34,10 @@ class SummaryHandler:
         Args:
             parsed_paper (ParsedPaperDTO): Parsed paper.
             pdf_file_path (pathlib.Path): Path to the pdf file.
+            summary_config (SummaryConfigDTO): Summary configuration.
 
         Returns:
-            str: Summary.
+            SummaryFormat: Summary of the paper in the specific format.
         """
         stem = str(pdf_file_path.stem)
         summary_file_path = pdf_file_path.parent / (stem + "_summary.json")
@@ -81,10 +84,10 @@ class SummaryHandler:
             vectorstore.save_local(str(pdf_file_path.parent / "index_wo_abstract"))
 
             # Generate summary.
-            llm_model = ChatOpenAI(  # type: ignore
+            llm_model = ChatOpenAI(
                 model_name=summary_config.llm_model_name,
                 temperature=summary_config.temperature,
-            )
+            )  # type: ignore
             summarizer = self.summarizer(
                 llm_model=llm_model,
                 vectorstore={
@@ -107,6 +110,16 @@ class SummaryHandler:
         text_splitter: TextSplitter,
         abstract_text: str | None = None,
     ) -> list[Document]:
+        """Convert parsed paper into structured documents.
+
+        Args:
+            parsed_paper (ParsedPaperDTO): Parsed paper.
+            text_splitter (TextSplitter): Text splitter.
+            abstract_text (str | None, optional): Full abstract text. Defaults to None.
+
+        Returns:
+            list[Document]: Structured documents.
+        """
         # If full abstract is provided, use it instead of parsed one.
         documents = [
             Document(

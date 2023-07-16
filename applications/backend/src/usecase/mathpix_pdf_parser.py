@@ -17,6 +17,8 @@ class MathpixPdfParser:
         Args:
             pdf_file_path pathlib.Path: path to pdf file
 
+        Returns:
+            str: latex format text
         """
         stem = str(pdf_file_path.stem)
         mathpix_file_path = pdf_file_path.parent / (stem + "_mathpix.txt")
@@ -39,7 +41,9 @@ class MathpixPdfParser:
                     "math_display_delimiters": ["$$", "$$"],
                 },
                 output_langchain_document=False,
-            ).load()["mmd"]  # type: ignore
+            ).load()[
+                "mmd"
+            ]  # type: ignore
 
             # Save latex format text.
             with mathpix_file_path.open("w") as f:
@@ -48,6 +52,14 @@ class MathpixPdfParser:
         return latex_text
 
     def parse_pdf(self, pdf_text: str) -> ParsedPaperDTO:
+        """Parse pdf text to structured data.
+
+        Args:
+            pdf_text (str): pdf text
+
+        Returns:
+            ParsedPaperDTO: parsed paper data
+        """
         if "\\begin{abstract}" in pdf_text:
             # Remove metadata contents before abstract
             _, contents = pdf_text.split("\\begin{abstract}")
@@ -126,6 +138,14 @@ class MathpixPdfParser:
         return ParsedPaperDTO.parse_obj(parsed_pdf)
 
     def simple_figure_table_remover(self, text: str) -> str:
+        """Remove figures and tables from text.
+
+        Args:
+            text (str): text
+
+        Returns:
+            str: text without figures and tables
+        """
         wo_table_text = re.sub(
             r"\\begin{tabular}(.*?)\\end{tabular}", "", text, flags=re.DOTALL
         )

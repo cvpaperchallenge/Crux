@@ -18,6 +18,8 @@ class PaperIOHandler:
         Args:
             pdf_file UploadFile: pdf file to save
 
+        Returns:
+            pathlib.Path: the path to the saved pdf file
         """
         directory_path = self.root_path / str(pdf_file.filename).removesuffix(".pdf")
         file_path = directory_path / str(pdf_file.filename)

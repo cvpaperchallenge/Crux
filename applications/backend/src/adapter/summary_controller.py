@@ -1,6 +1,6 @@
 import logging
 import pathlib
-from typing import Any, Final
+from typing import Final
 
 from fastapi import UploadFile
 
@@ -16,6 +16,8 @@ logging.basicConfig(level=logging.INFO)
 
 
 class SummaryController:
+    """The controller class for summarizing papers."""
+
     def __init__(
         self,
         paper_repository: RDBRepositoryGateway,
@@ -31,6 +33,16 @@ class SummaryController:
     def summarize(
         self, pdf_files: list[UploadFile], summary_config: SummaryConfigDTO
     ) -> list[SummaryFormat]:
+        """Summarize the given pdf files.
+
+        Args:
+            pdf_files (list[UploadFile]): The pdf files to summarize.
+            summary_config (SummaryConfigDTO): The config for summarizing.
+
+        Returns:
+            list[SummaryFormat]: The summary list of the given pdf files.
+        """
+        summary_list = []
         for i, pdf_file in enumerate(pdf_files):
             logger.info(
                 f"[{i+1}/{len(pdf_files)}] Start Processing `{pdf_file.filename}`."
