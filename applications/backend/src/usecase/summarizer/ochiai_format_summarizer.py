@@ -28,7 +28,6 @@ class OchiaiFormatSummarizer(BaseSummarizer):
             vectorstore=vectorstore,
             prompt_template_dir_path=prompt_template_dir_path,
         )
-        pass
 
     def summarize(self, verbose: bool = True) -> FormatOchiaiDTO:
         """"""

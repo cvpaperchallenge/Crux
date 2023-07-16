@@ -1,7 +1,7 @@
 import json
 import logging
 import pathlib
-from typing import Final
+from typing import Final, cast
 
 from langchain.chat_models import ChatOpenAI
 from langchain.docstore.document import Document
@@ -9,7 +9,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import TextSplitter, TokenTextSplitter
 from langchain.vectorstores import FAISS
 
-from src.domain.paper_format_dto import SummaryFormat, SummaryConfigDTO
+from src.domain.paper_format_dto import FORMAT_MAPPING, SummaryConfigDTO, SummaryFormat
 from src.domain.parsed_paper_dto import ParsedPaperDTO
 from src.usecase.summarizer import BaseSummarizer
 
@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class SummaryHandler:
-    def __init__(self, summarizer: BaseSummarizer) -> None:
+    def __init__(self, summarizer: type[BaseSummarizer]) -> None:
         self.summarizer = summarizer
 
     def make_summary(
@@ -46,6 +46,8 @@ class SummaryHandler:
             )
             with summary_file_path.open("r", encoding="utf-8") as f:
                 summary = json.load(f)
+            summary_format = FORMAT_MAPPING[summary_config.summary_type]
+            summary = summary_format.parse_obj(summary)
 
         else:
             # Convert text into to structured documents
@@ -60,7 +62,7 @@ class SummaryHandler:
             )
 
             # Embed documents and store into vector database.
-            embeddings = OpenAIEmbeddings()
+            embeddings = OpenAIEmbeddings()  # type: ignore
             vectorstore = FAISS.from_documents(
                 documents=documents,
                 embedding=embeddings,
@@ -79,7 +81,7 @@ class SummaryHandler:
             vectorstore.save_local(str(pdf_file_path.parent / "index_wo_abstract"))
 
             # Generate summary.
-            llm_model = ChatOpenAI(
+            llm_model = ChatOpenAI(  # type: ignore
                 model_name=summary_config.llm_model_name,
                 temperature=summary_config.temperature,
             )
@@ -97,7 +99,7 @@ class SummaryHandler:
             with summary_file_path.open("w", encoding="utf-8") as f:
                 json.dump(summary.dict(), f, indent=4, ensure_ascii=False)
 
-        return summary
+        return cast(SummaryFormat, summary)
 
     def structure_latex_documents(
         self,

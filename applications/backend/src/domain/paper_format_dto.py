@@ -1,4 +1,4 @@
-from typing import Literal, TypeAlias, Final
+from typing import Literal, TypeAlias
 
 from pydantic import BaseModel, Field
 
@@ -27,3 +27,8 @@ class FormatCVPaperDTO(BaseModel):
 
 
 SummaryFormat: TypeAlias = FormatCVPaperDTO | FormatOchiaiDTO
+
+FORMAT_MAPPING: dict[str, type[SummaryFormat]] = {
+    "ochiai": FormatOchiaiDTO,
+    "cvpaper": FormatCVPaperDTO,
+}

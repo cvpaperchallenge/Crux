@@ -1,10 +1,11 @@
 import pathlib
 from abc import ABC
-from typing import Any
 
 from jinja2 import Environment, FileSystemLoader
 from langchain.base_language import BaseLanguageModel
 from langchain.vectorstores.base import VectorStore
+
+from src.domain.paper_format_dto import SummaryFormat
 
 
 class BaseSummarizer(ABC):
@@ -29,5 +30,5 @@ class BaseSummarizer(ABC):
             loader=FileSystemLoader(str(prompt_template_dir_path))
         )
 
-    def summarize(self) -> Any:
+    def summarize(self) -> SummaryFormat:
         raise NotImplementedError
