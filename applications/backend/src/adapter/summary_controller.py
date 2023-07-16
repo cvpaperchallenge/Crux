@@ -5,7 +5,7 @@ from typing import Any, Final
 from fastapi import UploadFile
 
 from src.adapter.rdb_repository_gateway import RDBRepositoryGateway
-from src.domain.paper_format_dto import SummaryConfigDTO
+from src.domain.paper_format_dto import SummaryConfigDTO, SummaryFormat
 from src.usecase.mathpix_pdf_parser import MathpixPdfParser
 from src.usecase.paper_io_handler import PaperIOHandler
 from src.usecase.summarizer.ochiai_format_summarizer import OchiaiFormatSummarizer
@@ -30,7 +30,7 @@ class SummaryController:
 
     def summarize(
         self, pdf_files: list[UploadFile], summary_config: SummaryConfigDTO
-    ) -> dict[str, Any]:
+    ) -> list[SummaryFormat]:
         for i, pdf_file in enumerate(pdf_files):
             logger.info(
                 f"[{i+1}/{len(pdf_files)}] Start Processing `{pdf_file.filename}`."
@@ -46,3 +46,6 @@ class SummaryController:
             summary = self.summary_handler.make_summary(
                 parsed_pdf, pdf_file_path, summary_config
             )
+            summary_list.append(summary)
+
+        return summary_list
