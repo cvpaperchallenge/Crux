@@ -1,15 +1,12 @@
-# flake8: noqa
 import logging
 import pathlib
-from typing import Any, Dict, Final
+from typing import Dict, Final
 
 from langchain.base_language import BaseLanguageModel
 from langchain.chains import LLMChain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
-from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores.base import VectorStore
-from pydantic import SecretStr
 
 from src.domain.paper_format_dto import FormatOchiaiDTO
 from src.usecase.summarizer import BaseSummarizer
