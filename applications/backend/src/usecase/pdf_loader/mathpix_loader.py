@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 import pathlib
 import zipfile
-from typing import Any
+from typing import Any, Final
 
 import requests
 from langchain.docstore.document import Document
 from langchain.document_loaders import MathpixPDFLoader
+
+logger: Final = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 class CustomMathpixLoader(MathpixPDFLoader):
@@ -35,7 +39,7 @@ class CustomMathpixLoader(MathpixPDFLoader):
         self.output_path_for_tex = output_path_for_tex
         super().__init__(
             file_path,
-            processed_file_format,
+            processed_file_format,  # type: ignore
             max_wait_time_seconds,
             should_clean_pdf,
             **kwargs,
@@ -50,19 +54,27 @@ class CustomMathpixLoader(MathpixPDFLoader):
         }
         return {"options_json": json.dumps(options)}
 
-    def load(self) -> list[Document] | str:
+    def load(self) -> dict[str, Document | str] | dict[str, str]:  # type: ignore
         pdf_id = self.send_pdf()
         contents = self.get_processed_pdf(pdf_id)
         if self.should_clean_pdf:
-            contents = self.clean_pdf(contents)
+            if "mmd" not in contents:
+                logger.warning(
+                    "As 'should_clean_pdf' only supports mmd format, the cleaning process was skipped.  Please add 'mmd' in the 'processed_file_format' argument if you want to set 'True' for 'should_clean_pdf'."
+                )
+            else:
+                contents["mmd"] = self.clean_pdf(contents["mmd"])
         if self.output_langchain_document:
-            metadata = {"source": self.source, "file_path": self.source}
-            output = [Document(page_content=contents, metadata=metadata)]
-        else:
-            output = contents
-        return output
+            if "mmd" not in contents:
+                logger.warning(
+                    "As mmd format is not included in the output, the output format was not converted to Document.  Please add 'mmd' in the 'processed_file_format' argument if you want to set 'True' for 'output_langchain_document'."
+                )
+            else:
+                metadata = {"source": self.source, "file_path": self.source}
+                contents["mmd"] = Document(page_content=contents["mmd"], metadata=metadata)  # type: ignore
+        return contents
 
-    def get_processed_pdf(self, pdf_id: str) -> dict[str, str]:
+    def get_processed_pdf(self, pdf_id: str) -> dict[str, str]:  # type: ignore
         self.wait_for_processing(pdf_id)
         responses = dict()
         for conversion_format in self.processed_file_format:
@@ -71,7 +83,7 @@ class CustomMathpixLoader(MathpixPDFLoader):
             if conversion_format == "tex.zip":
                 with zipfile.ZipFile(io.BytesIO(response.content)) as z:
                     z.extractall(self.output_path_for_tex)
-                    responses["tex.zip"] = self.output_path_for_tex
+                    responses["tex.zip"] = str(self.output_path_for_tex)
             else:
                 responses[conversion_format] = response.content.decode("utf-8")
         return responses
