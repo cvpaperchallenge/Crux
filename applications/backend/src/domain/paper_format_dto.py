@@ -1,6 +1,14 @@
-from typing import TypeAlias
+from typing import Literal, TypeAlias, Final
 
 from pydantic import BaseModel, Field
+
+
+class SummaryConfigDTO(BaseModel):
+    summary_type: Literal["ochiai", "cvpaper"] = Field(description="Summary type")
+    llm_model_name: str = Field(description="LLM model name")
+    temperature: float = Field(description="Temperature for sampling")
+    chunk_size: int = Field(description="Chunk size for summarization")
+    chunk_overlap: int = Field(description="Chunk overlap for summarization")
 
 
 class FormatOchiaiDTO(BaseModel):

@@ -9,8 +9,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import TextSplitter, TokenTextSplitter
 from langchain.vectorstores import FAISS
 
-from src.domain.endpoint_dto import SummaryConfigDTO
-from src.domain.paper_format_dto import SummaryFormat
+from src.domain.paper_format_dto import SummaryFormat, SummaryConfigDTO
 from src.domain.parsed_paper_dto import ParsedPaperDTO
 from src.usecase.summarizer import BaseSummarizer
 

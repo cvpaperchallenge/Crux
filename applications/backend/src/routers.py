@@ -9,7 +9,8 @@ from pydantic import SecretStr
 
 from src.adapter.summary_controller import SummaryController
 from src.db.dummy_sql import DummySQL
-from src.domain.endpoint_dto import Health, SummaryConfigDTO
+from src.domain.endpoint_dto import Health
+from src.domain.paper_format_dto import SummaryConfigDTO
 
 router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
 

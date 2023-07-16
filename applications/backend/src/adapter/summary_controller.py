@@ -5,7 +5,7 @@ from typing import Any, Final
 from fastapi import UploadFile
 
 from src.adapter.rdb_repository_gateway import RDBRepositoryGateway
-from src.domain.endpoint_dto import SummaryConfigDTO
+from src.domain.paper_format_dto import SummaryConfigDTO
 from src.usecase.mathpix_pdf_parser import MathpixPdfParser
 from src.usecase.paper_io_handler import PaperIOHandler
 from src.usecase.summarizer.ochiai_format_summarizer import OchiaiFormatSummarizer
