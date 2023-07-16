@@ -10,7 +10,7 @@ from pydantic import SecretStr
 from src.adapter.summary_controller import SummaryController
 from src.db.dummy_sql import DummySQL
 from src.domain.endpoint_dto import Health
-from src.domain.paper_format_dto import SummaryConfigDTO
+from src.domain.paper_format_dto import SummaryConfigDTO, SummaryFormat
 
 router: Final = fastapi.APIRouter(default_response_class=ORJSONResponse)
 
@@ -58,7 +58,7 @@ async def summarize(
     chunk_overlap: Annotated[
         int, Form(description="Specify the chunk overlap for summarization")
     ] = 40,
-):
+) -> list[SummaryFormat]:
     os.environ["OPENAI_API_KEY"] = openai_api_key.get_secret_value()
     os.environ["MATHPIX_API_KEY"] = mathpix_api_key.get_secret_value()
     os.environ["MATHPIX_API_ID"] = mathpix_api_id.get_secret_value()
@@ -70,9 +70,9 @@ async def summarize(
         chunk_overlap=chunk_overlap,
     )
     return SummaryController(
-        paper_repository=DummySQL(talbe_name="paper", pk=["paper_id"], fk={}),
+        paper_repository=DummySQL(table_name="paper", pk=["paper_id"], fk={}),
         summary_repository=DummySQL(
-            talbe_name="summary",
+            table_name="summary",
             pk=["summary_id"],
             fk={"paper_id": {"table": "paper", "key": "paper_id"}},
         ),
