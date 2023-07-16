@@ -32,15 +32,14 @@ class MathpixPdfParser:
             logger.info(f"`{stem}` is sent to Mathpix API.")
             latex_text = CustomMathpixLoader(
                 file_path=str(pdf_file_path),
-                output_path_for_tex=str(pdf_file_path.parent),
+                output_path_for_tex=pdf_file_path.parent,
                 processed_file_format=["mmd", "tex.zip"],
                 other_request_parameters={
                     "math_inline_delimiters": ["$", "$"],
                     "math_display_delimiters": ["$$", "$$"],
                 },
                 output_langchain_document=False,
-            ).load()["mmd"]
-            latex_text = cast(str, latex_text)
+            ).load()["mmd"]  # type: ignore
 
             # Save latex format text.
             with mathpix_file_path.open("w") as f:
@@ -86,7 +85,7 @@ class MathpixPdfParser:
 
         # Split subsections
         for each_section_dict in section_list:
-            raw_subsection_list = each_section_dict["section_text"].split(
+            raw_subsection_list = cast(str, each_section_dict["section_text"]).split(
                 "\\subsection{"
             )
             # Go into next section if there is no subsection
