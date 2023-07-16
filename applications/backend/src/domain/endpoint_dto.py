@@ -15,10 +15,3 @@ class SummaryConfigDTO(BaseModel):
     temperature: float = Field(description="Temperature for sampling")
     chunk_size: int = Field(description="Chunk size for summarization")
     chunk_overlap: int = Field(description="Chunk overlap for summarization")
-
-
-class UserOut(BaseModel):
-    title: str
-    author: str
-    key_figure: str
-    summary_text: SummaryFormat
