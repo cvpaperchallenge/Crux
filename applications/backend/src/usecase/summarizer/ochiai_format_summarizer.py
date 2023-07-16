@@ -5,6 +5,7 @@ from typing import Dict, Final
 from langchain.base_language import BaseLanguageModel
 from langchain.chains import LLMChain
 from langchain.chains.combine_documents.stuff import StuffDocumentsChain
+from langchain.docstore.document import Document
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores.base import VectorStore
 
@@ -72,8 +73,7 @@ class OchiaiFormatSummarizer(BaseSummarizer):
         experiments: Final = retriever.get_relevant_documents("Experiments")
         resutls: Final = retriever.get_relevant_documents("Results")
 
-        abstract_docstore_id = self.vectorstore["all"].index_to_docstore_id[0]
-        abstract_document = self.vectorstore["all"].docstore._dict[abstract_docstore_id]
+        abstract_document = self._get_abstract_from_vectorstore()
         selected_documents.append(abstract_document)
         selected_documents.extend(proposed_method)
         selected_documents.extend(experiments)
@@ -177,3 +177,13 @@ class OchiaiFormatSummarizer(BaseSummarizer):
         )
         result: Final = retriever.get_relevant_documents(query)
         return combine_document_chain.run(result)
+
+    def _get_abstract_from_vectorstore(self) -> Document:
+        if self.vectorstore["all"].__class__.__name__ == "FAISS":
+            abstract_docstore_id = self.vectorstore["all"].index_to_docstore_id[0]  # type: ignore
+            abstract_document = self.vectorstore["all"].docstore.search(abstract_docstore_id)  # type: ignore
+        else:
+            raise NotImplementedError(
+                "Implement the logic to get abstract texts for other vectorstores."
+            )
+        return abstract_document  # type: ignore
