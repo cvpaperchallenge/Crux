@@ -1,11 +1,11 @@
 import os
 import pathlib
-from typing import Annotated, Any, Final, Literal
+from typing import Annotated, Final, Literal
 
 import fastapi
-from fastapi import Depends, File, Form, UploadFile
+from fastapi import File, Form, UploadFile
 from fastapi.responses import ORJSONResponse
-from pydantic import Json, SecretStr
+from pydantic import SecretStr
 
 from src.adapter.summary_controller import SummaryController
 from src.db.dummy_sql import DummySQL

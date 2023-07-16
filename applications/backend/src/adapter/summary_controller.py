@@ -3,7 +3,6 @@ import pathlib
 from typing import Any, Final
 
 from fastapi import UploadFile
-from pydantic import SecretStr
 
 from src.adapter.rdb_repository_gateway import RDBRepositoryGateway
 from src.domain.endpoint_dto import SummaryConfigDTO

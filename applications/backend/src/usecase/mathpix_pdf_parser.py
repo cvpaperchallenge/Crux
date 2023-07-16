@@ -3,8 +3,6 @@ import pathlib
 import re
 from typing import Final, cast
 
-from pydantic import SecretStr
-
 from src.domain.parsed_paper_dto import ParsedPaperDTO
 from src.usecase.pdf_loader import CustomMathpixLoader
 
