@@ -9,12 +9,12 @@ from langchain.vectorstores.base import VectorStore
 
 class BaseSummarizer(ABC):
     """Base class for summarizer.
-    
+
     Args:
         llm_model (BaseLanguageModel): language model to use
         vectorstore (dict[str, VectorStore]): vectorstore to use
         prompt_template_dir_path (pathlib.Path): path to prompt template directory
-        
+
     """
 
     def __init__(

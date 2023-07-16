@@ -17,6 +17,7 @@ from src.usecase.summarizer import BaseSummarizer
 logger: Final = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+
 class OchiaiFormatSummarizer(BaseSummarizer):
     def __init__(
         self,

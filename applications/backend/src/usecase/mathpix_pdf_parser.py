@@ -1,15 +1,16 @@
-import re
-import pathlib
 import logging
+import pathlib
+import re
 from typing import Final, cast
 
 from pydantic import SecretStr
 
-from src.usecase.pdf_loader import CustomMathpixLoader
 from src.domain.parsed_paper_dto import ParsedPaperDTO
+from src.usecase.pdf_loader import CustomMathpixLoader
 
 logger: Final = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
+
 
 class MathpixPdfParser:
     def load_pdf(self, pdf_file_path: pathlib.Path) -> str:
@@ -21,7 +22,7 @@ class MathpixPdfParser:
         """
         stem = str(pdf_file_path.stem)
         mathpix_file_path = pdf_file_path.parent / (stem + "_mathpix.txt")
-        
+
         # If mathpix file already exists, continue loop.
         if mathpix_file_path.exists():
             logger.info(f"`{str(mathpix_file_path)}` already exists.")
@@ -46,7 +47,7 @@ class MathpixPdfParser:
             # Save latex format text.
             with mathpix_file_path.open("w") as f:
                 f.write(latex_text)
-        
+
         return latex_text
 
     def parse_pdf(self, pdf_text: str) -> ParsedPaperDTO:
@@ -57,7 +58,7 @@ class MathpixPdfParser:
             # Extract abstract
             abstract, contents_wo_abstract = contents.split("\n\\end{abstract}")
         else:
-            pattern = re.compile(r'abstract', re.IGNORECASE)
+            pattern = re.compile(r"abstract", re.IGNORECASE)
 
             # Remove metadata contents before abstract
             _, contents = re.split(pattern, pdf_text, 1)
@@ -87,7 +88,9 @@ class MathpixPdfParser:
 
         # Split subsections
         for each_section_dict in section_list:
-            raw_subsection_list = each_section_dict["section_text"].split("\\subsection{")
+            raw_subsection_list = each_section_dict["section_text"].split(
+                "\\subsection{"
+            )
             # Go into next section if there is no subsection
             if len(raw_subsection_list) == 1:
                 each_section_dict["subsection_list"] = []
@@ -125,10 +128,11 @@ class MathpixPdfParser:
 
         return ParsedPaperDTO.parse_obj(parsed_pdf)
 
-
     def simple_figure_table_remover(self, text: str) -> str:
         wo_table_text = re.sub(
             r"\\begin{tabular}(.*?)\\end{tabular}", "", text, flags=re.DOTALL
         )
-        wo_fig_table_text = re.sub(r"!\[\]\((.*?)\)\n", "", wo_table_text, flags=re.DOTALL)
+        wo_fig_table_text = re.sub(
+            r"!\[\]\((.*?)\)\n", "", wo_table_text, flags=re.DOTALL
+        )
         return wo_fig_table_text

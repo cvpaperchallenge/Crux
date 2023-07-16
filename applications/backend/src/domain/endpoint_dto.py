@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 from src.domain.paper_format_dto import SummaryFormat
 
+
 class Health(BaseModel):
     health: str
 

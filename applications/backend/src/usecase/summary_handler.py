@@ -9,27 +9,25 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import TextSplitter, TokenTextSplitter
 from langchain.vectorstores import FAISS
 
-from src.usecase.summarizer import BaseSummarizer
-from src.domain.parsed_paper_dto import ParsedPaperDTO
-from src.domain.paper_format_dto import SummaryFormat
 from src.domain.endpoint_dto import SummaryConfigDTO
+from src.domain.paper_format_dto import SummaryFormat
+from src.domain.parsed_paper_dto import ParsedPaperDTO
+from src.usecase.summarizer import BaseSummarizer
 
 logger: Final = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-class SummaryHandler():
-    def __init__(
-            self,
-            summarizer: BaseSummarizer
-        ) -> None:
+
+class SummaryHandler:
+    def __init__(self, summarizer: BaseSummarizer) -> None:
         self.summarizer = summarizer
 
     def make_summary(
-            self,
-            parsed_paper: ParsedPaperDTO,
-            pdf_file_path: pathlib.Path,
-            summary_config: SummaryConfigDTO
-        ) -> SummaryFormat:
+        self,
+        parsed_paper: ParsedPaperDTO,
+        pdf_file_path: pathlib.Path,
+        summary_config: SummaryConfigDTO,
+    ) -> SummaryFormat:
         """Make a summary from the parsed pdf.
 
         Args:
@@ -44,10 +42,12 @@ class SummaryHandler():
 
         # If summary already exists, continue the loop.
         if summary_file_path.exists():
-            logger.info(f"`{str(summary_file_path)}` already exists. Continue the loop.")
+            logger.info(
+                f"`{str(summary_file_path)}` already exists. Continue the loop."
+            )
             with summary_file_path.open("r", encoding="utf-8") as f:
                 summary = json.load(f)
-        
+
         else:
             # Convert text into to structured documents
             text_splitter = TokenTextSplitter.from_tiktoken_encoder(
@@ -80,7 +80,10 @@ class SummaryHandler():
             vectorstore.save_local(str(pdf_file_path.parent / "index_wo_abstract"))
 
             # Generate summary.
-            llm_model = ChatOpenAI(model_name=summary_config.llm_model_name, temperature=summary_config.temperature)
+            llm_model = ChatOpenAI(
+                model_name=summary_config.llm_model_name,
+                temperature=summary_config.temperature,
+            )
             summarizer = self.summarizer(
                 llm_model=llm_model,
                 vectorstore={
@@ -96,7 +99,7 @@ class SummaryHandler():
                 json.dump(summary.dict(), f, indent=4, ensure_ascii=False)
 
         return summary
-            
+
     def structure_latex_documents(
         self,
         parsed_paper: ParsedPaperDTO,
@@ -120,7 +123,10 @@ class SummaryHandler():
             section_id = each_section.section_id
             section_text = each_section.section_text
             if section_text:
-                metadata = {"section_id": f"{section_id}", "section": f"{section_title}"}
+                metadata = {
+                    "section_id": f"{section_id}",
+                    "section": f"{section_title}",
+                }
                 for each_section_text in text_splitter.split_text(section_text):
                     documents.append(
                         Document(page_content=each_section_text, metadata=metadata)
