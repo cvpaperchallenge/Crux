@@ -65,13 +65,13 @@ class CustomMathpixLoader(MathpixPDFLoader):
     def get_processed_pdf(self, pdf_id: str) -> dict[str, str]:
         self.wait_for_processing(pdf_id)
         responses = dict()
-        for conversion_formats in self.processed_file_format:
-            url = f"{self.url}/{pdf_id}.{conversion_formats}"
+        for conversion_format in self.processed_file_format:
+            url = f"{self.url}/{pdf_id}.{conversion_format}"
             response = requests.get(url, headers=self.headers)
-            if conversion_formats == "tex.zip":
+            if conversion_format == "tex.zip":
                 with zipfile.ZipFile(io.BytesIO(response.content)) as z:
                     z.extractall(self.output_path_for_tex)
                     responses["tex.zip"] = self.output_path_for_tex
             else:
-                responses[conversion_formats] = response.content.decode("utf-8")
+                responses[conversion_format] = response.content.decode("utf-8")
         return responses
