@@ -1,6 +1,6 @@
 import logging
 import pathlib
-from typing import Dict, Final, cast
+from typing import Final, cast
 
 from langchain.base_language import BaseLanguageModel
 from langchain.chains import LLMChain
@@ -172,7 +172,7 @@ class OchiaiFormatSummarizer(BaseSummarizer):
         prompt_template_filename: str,
         prompt_input_variable: str,
         search_type: str = "similarity",
-        search_kwargs: Dict = {"k": 5},
+        search_kwargs: dict = {"k": 5},
         verbose: bool = True,
     ) -> str:
         """Run combine document chain.
@@ -182,7 +182,7 @@ class OchiaiFormatSummarizer(BaseSummarizer):
             prompt_template_filename (str): template filename for prompt
             prompt_input_variable (str): input variable name for prompt
             search_type (str, optional): search type for vectorstore. Defaults to "similarity".
-            search_kwargs (Dict, optional): search kwargs for vectorstore. Defaults to {"k": 5}.
+            search_kwargs (dict, optional): search kwargs for vectorstore. Defaults to {"k": 5}.
             verbose (bool, optional): verbose. Defaults to True.
 
         Returns:
