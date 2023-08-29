@@ -1,6 +1,6 @@
 import logging
 import pathlib
-from typing import Dict, Final
+from typing import Dict, Final, cast
 
 from langchain.base_language import BaseLanguageModel
 from langchain.chains import LLMChain
@@ -94,7 +94,7 @@ class OchiaiFormatSummarizer(BaseSummarizer):
         selected_documents.extend(proposed_method)
         selected_documents.extend(experiments)
         selected_documents.extend(resutls)
-        return combine_document_chain.run(selected_documents)
+        return cast(str, combine_document_chain.run(selected_documents))
 
     def _summarize_contribution(self, verbose: bool = True) -> str:
         """`先行研究と比べてどこがすごい？`"""
@@ -123,11 +123,14 @@ class OchiaiFormatSummarizer(BaseSummarizer):
         overall_chain = LLMChain(
             llm=self.llm_model, prompt=overall_prompt, verbose=verbose
         )
-        return overall_chain.run(
-            {
-                "contribution": contribution,
-                "problem": problem,
-            }
+        return cast(
+            str,
+            overall_chain.run(
+                {
+                    "contribution": contribution,
+                    "problem": problem,
+                }
+            ),
         )
 
     def _summarize_method(self, verbose: bool = True) -> str:
@@ -204,7 +207,7 @@ class OchiaiFormatSummarizer(BaseSummarizer):
             search_kwargs=search_kwargs,
         )
         result: Final = retriever.get_relevant_documents(query)
-        return combine_document_chain.run(result)
+        return cast(str, combine_document_chain.run(result))
 
     def _get_abstract_from_vectorstore(self) -> Document:
         """Get abstract from vectorstore.

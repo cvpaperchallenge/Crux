@@ -62,10 +62,10 @@ class MathpixPdfParser:
         """
         if "\\begin{abstract}" in pdf_text:
             # Remove metadata contents before abstract
-            _, contents = pdf_text.split("\\begin{abstract}")
+            _, contents = pdf_text.split("\\begin{abstract}", 1)
 
             # Extract abstract
-            abstract, contents_wo_abstract = contents.split("\n\\end{abstract}")
+            abstract, contents_wo_abstract = contents.split("\n\\end{abstract}", 1)
         else:
             pattern = re.compile(r"abstract", re.IGNORECASE)
 
