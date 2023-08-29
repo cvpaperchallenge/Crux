@@ -1,5 +1,5 @@
 import pathlib
-from abc import ABC
+from abc import ABC, abstractmethod
 
 from jinja2 import Environment, FileSystemLoader
 from langchain.base_language import BaseLanguageModel
@@ -30,5 +30,6 @@ class BaseSummarizer(ABC):
             loader=FileSystemLoader(str(prompt_template_dir_path))
         )
 
+    @abstractmethod
     def summarize(self) -> SummaryFormat:
         raise NotImplementedError
