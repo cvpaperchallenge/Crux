@@ -40,15 +40,14 @@ faiss-cpu = "^1.7.4"
 jinja2 = "^3.1.2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
+black = "^23.7.0"
 ruff = "^0.0.286"
 mdformat-gfm = "^0.3.5"
 mdformat-frontmatter = "^2.0.1"
 mdformat-footnote = "^0.1.1"
-flake8 = "^6.0.0"
-mypy = "^1.3.0"
-pytest-cov = "^4.0.0"
-types-requests = "^2.31.0.1"
+mypy = "^1.5.1"
+pytest-cov = "^4.1.0"
+types-requests = "^2.31.0.2"
 
 [tool.black]
 line-length = 88
